@@ -373,6 +373,20 @@
     transition: background-size 0.35s ease;
   }
   .project:hover h3 { background-size: 100% 2px; }
+  .project h3 .live {
+    display: inline-block;
+    margin-left: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--redline);
+    border: 1px solid var(--redline);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .project h3 a:hover .live { background: var(--redline); color: var(--paper); }
   .project p {
     margin: 0;
     max-width: 52ch;
@@ -502,12 +516,23 @@
   }
 
   /* ============================================================
-     SCROLL REVEAL
+     SCROLL REVEAL — CSS-only, and only where supported.
+     Content is visible by default; the fade is pure enhancement,
+     so the page can never render blank.
      ============================================================ */
-  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
-  .reveal.in { opacity: 1; transform: translateY(0); }
-  /* if JS never runs, show everything */
-  html:not(.js) .reveal { opacity: 1; transform: none; transition: none; }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 55%;
+      }
+      @keyframes reveal-in {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -516,7 +541,6 @@
       transition-duration: 0.001ms !important;
     }
     .hero .eyebrow, .hero h1, .hero .role, .hero .scope, .hero .meta, .hero .cta-row { opacity: 1; }
-    .reveal { opacity: 1; transform: none; }
   }
 </style>
 </head>
@@ -583,6 +607,20 @@
     <article class="project reveal">
       <span class="pidx">P&#8209;01</span>
       <div>
+        <h3><a href="datum.html">Datum &mdash; Construction PM <span class="live">Live demo &rarr;</span></a></h3>
+        <p>A project management workspace built for how a contractor actually runs work: projects and contract value, activity schedules with a Gantt view, milestones, a punch list by severity and trade, daily site logs with weather and manpower, and RFI tracking. One dashboard surfaces what&rsquo;s overdue, at risk, or waiting on an answer. Single file, no backend, no login &mdash; data lives in the browser.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>Design &amp; build</dd></div>
+        <div><dt>Stack</dt><dd>HTML, JS &middot; no backend</dd></div>
+        <div class="status"><dt>Status</dt><dd>Live demo</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+
+    <article class="project reveal">
+      <span class="pidx">P&#8209;02</span>
+      <div>
         <h3>RiteHome Quotation Estimators</h3>
         <p>Three single-file web tools that turn a room sketch into an itemized, auditable quotation &mdash; a drawing canvas, automatic quantity takeoff, and a priced bill of materials with markup and contingency logic built in. The kitchen and CR-partition estimators are in daily use for live quoting; the closet/wardrobe tool is in final review.</p>
       </div>
@@ -595,7 +633,7 @@
     </article>
 
     <article class="project reveal">
-      <span class="pidx">P&#8209;02</span>
+      <span class="pidx">P&#8209;03</span>
       <div>
         <h3>B2B Lead Generation Pipeline</h3>
         <p>An n8n workflow that sweeps 32 cities for prospective clients &mdash; pulls business listings, visits each website, and extracts contact and firmographic data into a single sheet. A social-link pre-filter cut a full test run from nine minutes to twenty-five seconds. Operational for core data; owner-contact enrichment is wired and waiting on an API key.</p>
@@ -609,7 +647,7 @@
     </article>
 
     <article class="project reveal">
-      <span class="pidx">P&#8209;03</span>
+      <span class="pidx">P&#8209;04</span>
       <div>
         <h3>AI Memory Vault</h3>
         <p>A persistent, plain-text knowledge layer that lets AI assistants carry context between sessions &mdash; one fact per file, a written protocol, and a graph that links decisions to the work they touched. Built so nothing learned in one conversation has to be re-explained in the next.</p>
@@ -623,7 +661,7 @@
     </article>
 
     <article class="project reveal">
-      <span class="pidx">P&#8209;04</span>
+      <span class="pidx">P&#8209;05</span>
       <div>
         <h3>Lead Pipeline Tracker</h3>
         <p>A live web tracker for the full sales path &mdash; inquiry, site visit, quotation, reservation, awarded project &mdash; capturing every data point so win-rate can be measured by source, product line, and price band instead of guessed at.</p>
@@ -692,24 +730,5 @@
 
 </main>
 
-<script>
-  (function () {
-    document.documentElement.classList.add("js");
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || !("IntersectionObserver" in window)) {
-      document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
-      return;
-    }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
-    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
-  })();
-</script>
 </body>
 </html>
