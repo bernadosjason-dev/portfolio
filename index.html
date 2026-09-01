@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jason Bernados — Systems &amp; Automation</title>
+<meta name="description" content="Portfolio of Jason Bernados: civil engineer building practical automation for construction and modular-manufacturing businesses — estimators, lead pipelines, and knowledge systems." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  /* ============================================================
+     TOKENS — light ("drafting sheet")
+     ============================================================ */
+  :root {
+    --paper:      #F3F4F1;
+    --paper-2:    #EAEBE5;
+    --paper-3:    #E2E3DB;
+    --ink:        #1B1E1B;
+    --ink-2:      #45493F;
+    --ink-3:      #63675D;
+    --line:       #C7C9BF;
+    --line-2:     #D8D9D1;
+    --redline:    #C43D2B;
+    --sheet-edge: #B7B8AE;
+    --focus:      #C43D2B;
+
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-body:    "Hanken Grotesk", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --step--1: 0.8125rem;
+    --step-0:  1rem;
+    --step-1:  1.1875rem;
+    --step-2:  1.5rem;
+    --step-3:  2rem;
+    --step-4:  2.625rem;
+    --display: clamp(2.5rem, 1.4rem + 4.6vw, 4.5rem);
+
+    --measure: 64ch;
+    --gutter:  clamp(1.25rem, 5vw, 4rem);
+    --frame:   clamp(8px, 1.4vw, 16px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #16181A;
+      --paper-2:    #1D2023;
+      --paper-3:    #24282B;
+      --ink:        #E9E8E1;
+      --ink-2:      #B7B9B2;
+      --ink-3:      #8C9187;
+      --line:       #33373B;
+      --line-2:     #262A2D;
+      --redline:    #E4573F;
+      --sheet-edge: #3A3F43;
+      --focus:      #E4573F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #16181A;
+    --paper-2:    #1D2023;
+    --paper-3:    #24282B;
+    --ink:        #E9E8E1;
+    --ink-2:      #B7B9B2;
+    --ink-3:      #8C9187;
+    --line:       #33373B;
+    --line-2:     #262A2D;
+    --redline:    #E4573F;
+    --sheet-edge: #3A3F43;
+    --focus:      #E4573F;
+  }
+
+  /* ============================================================
+     RESET / BASE
+     ============================================================ */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* faint engineering grid */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--line-2) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
+    background-size: 38px 38px;
+    background-position: center;
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  /* drawing-sheet border */
+  .sheet-frame {
+    position: fixed;
+    inset: var(--frame);
+    z-index: 40;
+    pointer-events: none;
+    border: 1px solid var(--sheet-edge);
+    animation: frame-in 0.7s ease-out both;
+  }
+  .sheet-frame::before,
+  .sheet-frame::after {
+    content: "";
+    position: absolute;
+    width: 9px; height: 9px;
+    border: 1px solid var(--sheet-edge);
+  }
+  .sheet-frame::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+  .sheet-frame::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+  @keyframes frame-in {
+    from { opacity: 0; transform: scale(1.012); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.6rem 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    z-index: 100;
+  }
+  .skip:focus { left: var(--gutter); top: var(--gutter); }
+
+  /* ============================================================
+     LAYOUT
+     ============================================================ */
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+
+  section { padding-block: clamp(3.5rem, 9vw, 7rem); }
+
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 0;
+  }
+
+  /* section headers — sheet index + title */
+  .s-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: clamp(1rem, 4vw, 2.5rem);
+    margin-bottom: clamp(2rem, 5vw, 3.25rem);
+  }
+  .s-head .idx {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    color: var(--redline);
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--redline);
+    white-space: nowrap;
+  }
+  .s-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .lede {
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+  .lede + .lede { margin-top: 1.1rem; }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero {
+    padding-top: clamp(4.5rem, 13vw, 9rem);
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+  .hero .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 1.4rem;
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.15s forwards;
+  }
+  .hero h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--display);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.25s forwards;
+  }
+  .hero .role {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: clamp(0.9rem, 0.8rem + 0.5vw, 1.05rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--redline);
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.35s forwards;
+  }
+  .hero .scope {
+    margin: 1.9rem 0 0;
+    max-width: 54ch;
+    font-size: var(--step-1);
+    color: var(--ink-2);
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.45s forwards;
+  }
+  .hero .meta {
+    margin: 2.4rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-3);
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.55s forwards;
+  }
+  .hero .meta span { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .hero .meta span::before {
+    content: "";
+    width: 6px; height: 6px;
+    background: var(--redline);
+  }
+  .hero .cta-row {
+    margin-top: 2.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.65s forwards;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.4rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.04em;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: transparent;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary:hover { background: var(--redline); border-color: var(--redline); }
+  .btn.ghost:hover { background: var(--paper-2); }
+  .btn .arrow { transition: transform 0.18s ease; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ============================================================
+     PROFILE
+     ============================================================ */
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  @media (min-width: 780px) {
+    .profile-grid { grid-template-columns: 1.6fr 1fr; }
+  }
+  .facts {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    border-top: 1px solid var(--line);
+  }
+  .facts div {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .facts dt { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .facts dd { margin: 0; color: var(--ink); }
+
+  /* ============================================================
+     WORK
+     ============================================================ */
+  .project {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem 2.5rem;
+    padding: clamp(1.75rem, 4vw, 2.75rem) 0;
+    border-top: 1px solid var(--line);
+    position: relative;
+  }
+  .project:last-of-type { border-bottom: 1px solid var(--line); }
+  @media (min-width: 860px) {
+    .project { grid-template-columns: 3.5rem 1fr 15rem; }
+  }
+
+  .project .pidx {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .project h3 {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-2);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    display: inline-block;
+    background-image: linear-gradient(var(--redline), var(--redline));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.35s ease;
+  }
+  .project:hover h3 { background-size: 100% 2px; }
+  .project p {
+    margin: 0;
+    max-width: 52ch;
+    color: var(--ink-2);
+  }
+
+  .spec {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    line-height: 1.45;
+    align-self: start;
+  }
+  .spec div {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    gap: 0.75rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .spec dt { color: var(--ink-3); }
+  .spec dd { margin: 0; color: var(--ink); }
+  .spec .status dd { color: var(--redline); }
+
+  /* ============================================================
+     CAPABILITIES
+     ============================================================ */
+  .caps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 720px) {
+    .caps { grid-template-columns: 1fr 1fr; }
+    .caps .cap:nth-child(odd) { border-right: 1px solid var(--line); padding-right: 2.5rem; }
+    .caps .cap:nth-child(even) { padding-left: 2.5rem; }
+  }
+  .cap {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .cap h3 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--redline);
+  }
+  .cap p { margin: 0; color: var(--ink-2); font-size: 0.96rem; }
+
+  /* ============================================================
+     CONTACT
+     ============================================================ */
+  .contact .lede { margin-bottom: 2rem; }
+  .contact-lines {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    border-top: 1px solid var(--line);
+  }
+  .contact-lines a, .contact-lines span {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .contact-lines a .k, .contact-lines span .k { color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .contact-lines a .v { position: relative; width: max-content; max-width: 100%; }
+  .contact-lines a .v::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -2px;
+    width: 100%; height: 1px;
+    background: var(--redline);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .contact-lines a:hover .v::after { transform: scaleX(1); }
+
+  /* ============================================================
+     TITLEBLOCK
+     ============================================================ */
+  .titleblock {
+    position: fixed;
+    right: calc(var(--frame) + 10px);
+    bottom: calc(var(--frame) + 10px);
+    z-index: 45;
+    display: none;
+    background: var(--paper);
+    border: 1px solid var(--sheet-edge);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+  .titleblock div {
+    display: grid;
+    grid-template-columns: 4.6rem 1fr;
+  }
+  .titleblock div + div { border-top: 1px solid var(--line); }
+  .titleblock .k {
+    padding: 0.4rem 0.6rem;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+    border-right: 1px solid var(--line);
+  }
+  .titleblock .v { padding: 0.4rem 0.7rem; color: var(--ink); white-space: nowrap; }
+  @media (min-width: 1180px) { .titleblock { display: block; } }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  footer {
+    padding: 2.5rem 0 3.5rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.5rem;
+    justify-content: space-between;
+  }
+
+  /* ============================================================
+     SCROLL REVEAL
+     ============================================================ */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  /* if JS never runs, show everything */
+  html:not(.js) .reveal { opacity: 1; transform: none; transition: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.001ms !important;
+    }
+    .hero .eyebrow, .hero h1, .hero .role, .hero .scope, .hero .meta, .hero .cta-row { opacity: 1; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#work">Skip to work</a>
+<div class="sheet-frame" aria-hidden="true"></div>
+
+<div class="titleblock" aria-hidden="true">
+  <div><span class="k">NAME</span><span class="v">Jason Bernados</span></div>
+  <div><span class="k">DISC.</span><span class="v">Systems / Automation / Civil</span></div>
+  <div><span class="k">LOC.</span><span class="v">Cagayan de Oro, PH</span></div>
+  <div><span class="k">REV.</span><span class="v">2026.09</span></div>
+  <div><span class="k">SHEET</span><span class="v">01 / 01</span></div>
+</div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <p class="eyebrow">Portfolio &nbsp;/&nbsp; 2026</p>
+    <h1>Jason Bernados</h1>
+    <p class="role">AI Systems Strategist &mdash; Civil Engineer</p>
+    <p class="scope">I build the systems that quote the job, find the leads, and keep the knowledge &mdash; practical automation for construction and modular-manufacturing businesses.</p>
+    <div class="meta">
+      <span>Cagayan de Oro, Philippines</span>
+      <span>Open to automation projects &amp; site engineering roles</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="mailto:bernados.jason@gmail.com">Get in touch <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <a class="btn ghost" href="#work">See selected work</a>
+    </div>
+  </header>
+
+  <hr class="rule" />
+
+  <!-- PROFILE -->
+  <section id="profile" aria-labelledby="profile-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;01</span>
+      <h2 id="profile-h">Profile</h2>
+    </div>
+    <div class="profile-grid">
+      <div>
+        <p class="lede reveal">Civil engineering graduate of Xavier University. Two years on site as a Site Engineer with Fixboss Construction before moving into the family manufacturing business, Ritehome Modular Systems, where I&rsquo;m Assistant Head of Sales.</p>
+        <p class="lede reveal">Somewhere between the takeoff sheets and the quote deadlines I started building the tools I wished existed &mdash; first a kitchen estimator, then a lead pipeline, then a memory system so the work stopped getting lost between projects. That&rsquo;s the thread now: turning repetitive, error-prone office work into systems that run themselves.</p>
+      </div>
+      <dl class="facts reveal">
+        <div><dt>Base</dt><dd>Cagayan de Oro, PH</dd></div>
+        <div><dt>Education</dt><dd>BS Civil Engineering, Xavier University</dd></div>
+        <div><dt>Field</dt><dd>Site Engineer, Fixboss Construction &middot; 2022&ndash;2024</dd></div>
+        <div><dt>Current</dt><dd>Asst. Head of Sales, Ritehome Modular Systems &middot; 2024&ndash;</dd></div>
+        <div><dt>Focus</dt><dd>Estimation systems, workflow automation, AI integration</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work" aria-labelledby="work-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;02</span>
+      <h2 id="work-h">Selected Work</h2>
+    </div>
+
+    <article class="project reveal">
+      <span class="pidx">P&#8209;01</span>
+      <div>
+        <h3>RiteHome Quotation Estimators</h3>
+        <p>Three single-file web tools that turn a room sketch into an itemized, auditable quotation &mdash; a drawing canvas, automatic quantity takeoff, and a priced bill of materials with markup and contingency logic built in. The kitchen and CR-partition estimators are in daily use for live quoting; the closet/wardrobe tool is in final review.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>Design &amp; build</dd></div>
+        <div><dt>Stack</dt><dd>HTML, JS, SVG &middot; no backend</dd></div>
+        <div class="status"><dt>Status</dt><dd>In use</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+
+    <article class="project reveal">
+      <span class="pidx">P&#8209;02</span>
+      <div>
+        <h3>B2B Lead Generation Pipeline</h3>
+        <p>An n8n workflow that sweeps 32 cities for prospective clients &mdash; pulls business listings, visits each website, and extracts contact and firmographic data into a single sheet. A social-link pre-filter cut a full test run from nine minutes to twenty-five seconds. Operational for core data; owner-contact enrichment is wired and waiting on an API key.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>Automation design</dd></div>
+        <div><dt>Stack</dt><dd>n8n, Places API, Firecrawl</dd></div>
+        <div class="status"><dt>Status</dt><dd>Operational</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+
+    <article class="project reveal">
+      <span class="pidx">P&#8209;03</span>
+      <div>
+        <h3>AI Memory Vault</h3>
+        <p>A persistent, plain-text knowledge layer that lets AI assistants carry context between sessions &mdash; one fact per file, a written protocol, and a graph that links decisions to the work they touched. Built so nothing learned in one conversation has to be re-explained in the next.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>System design</dd></div>
+        <div><dt>Stack</dt><dd>Obsidian, Markdown</dd></div>
+        <div class="status"><dt>Status</dt><dd>Live</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+
+    <article class="project reveal">
+      <span class="pidx">P&#8209;04</span>
+      <div>
+        <h3>Lead Pipeline Tracker</h3>
+        <p>A live web tracker for the full sales path &mdash; inquiry, site visit, quotation, reservation, awarded project &mdash; capturing every data point so win-rate can be measured by source, product line, and price band instead of guessed at.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>Build</dd></div>
+        <div><dt>Stack</dt><dd>Web app, structured logging</dd></div>
+        <div class="status"><dt>Status</dt><dd>Live</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section id="capabilities" aria-labelledby="cap-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;03</span>
+      <h2 id="cap-h">Capabilities</h2>
+    </div>
+    <div class="caps">
+      <div class="cap reveal">
+        <h3>Estimation &amp; Takeoff</h3>
+        <p>BOQ preparation, quantity takeoff, markup and contingency modelling, cut-list optimization.</p>
+      </div>
+      <div class="cap reveal">
+        <h3>Workflow Automation</h3>
+        <p>n8n and Make, API integration, web scraping, scheduled and unattended pipelines.</p>
+      </div>
+      <div class="cap reveal">
+        <h3>AI Integration</h3>
+        <p>LLM-driven extraction, retrieval and memory systems, prompt design, content pipelines.</p>
+      </div>
+      <div class="cap reveal">
+        <h3>Site &amp; Construction</h3>
+        <p>Site supervision, project documentation, and quality control &mdash; two years in the field.</p>
+      </div>
+      <div class="cap reveal">
+        <h3>Tooling</h3>
+        <p>Self-contained HTML/JS applications, SVG drawing interfaces, spreadsheet systems.</p>
+      </div>
+      <div class="cap reveal">
+        <h3>Ways of working</h3>
+        <p>Direct, deadline-driven, solo operator. Ships the smallest thing that removes the manual step.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact" aria-labelledby="contact-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;04</span>
+      <h2 id="contact-h">Contact</h2>
+    </div>
+    <p class="lede reveal">Open to automation projects for construction and manufacturing businesses, and to site engineering roles. The fastest way to reach me is email.</p>
+    <div class="contact-lines reveal">
+      <a href="mailto:bernados.jason@gmail.com"><span class="k">Email</span><span class="v">bernados.jason@gmail.com</span></a>
+      <span><span class="k">Location</span><span class="v">Cagayan de Oro, Philippines</span></span>
+      <span><span class="k">Status</span><span class="v">Available &mdash; projects &amp; roles</span></span>
+    </div>
+  </section>
+
+  <footer>
+    <span>Jason Bernados &middot; 2026</span>
+    <span>Drawn as a single HTML file &middot; no trackers</span>
+  </footer>
+
+</main>
+
+<script>
+  (function () {
+    document.documentElement.classList.add("js");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !("IntersectionObserver" in window)) {
+      document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add("in");
+          io.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>
