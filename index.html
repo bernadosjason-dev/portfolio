@@ -8,6 +8,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F3F4F1'/%3E%3Crect x='4.5' y='4.5' width='23' height='23' fill='none' stroke='%231B1E1B' stroke-width='1.4'/%3E%3Cpath d='M4 12V4h8M28 20v8h-8' fill='none' stroke='%23C43D2B' stroke-width='2.6'/%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://bernadosjason-dev.github.io/portfolio/" />
+<meta property="og:title" content="Jason Bernados — Construction SaaS" />
+<meta property="og:description" content="Estimating, pipeline, project and content tools for construction businesses — built by someone who has run the work they are built for. Remote, US clients." />
+<meta property="og:image" content="https://bernadosjason-dev.github.io/portfolio/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Jason Bernados — Construction SaaS" />
+<meta name="twitter:description" content="Estimating, pipeline, project and content tools for construction businesses — built by someone who has run the work." />
+<meta name="twitter:image" content="https://bernadosjason-dev.github.io/portfolio/og.png" />
+<!-- Analytics: cookieless, no personal data. Create a free property at dash.cloudflare.com > Web Analytics, then uncomment and paste your token. -->
+<!-- <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"YOUR_TOKEN_HERE"}'></script> -->
 <style>
   /* ============================================================
      TOKENS — light ("drafting sheet")
@@ -607,26 +621,25 @@
     <article class="project reveal">
       <span class="pidx">P&#8209;01</span>
       <div>
+        <h3><a href="estimator.html">Cabinet Estimating Suite <span class="live">Live demo &rarr;</span></a></h3>
+        <p>Seven single-file web tools that turn a room sketch into an itemized, auditable estimate &mdash; a drawing canvas, automatic quantity takeoff, and a priced bill of materials with markup and contingency logic built in. Covers kitchens, closets, restroom partitions, vanities, media walls, office casework and bar units. In daily use for live bidding, and the tool the pilot program below is built around.</p>
+      </div>
+      <dl class="spec">
+        <div><dt>Role</dt><dd>Design &amp; build</dd></div>
+        <div><dt>Stack</dt><dd>HTML, JS, SVG &middot; no backend</dd></div>
+        <div class="status"><dt>Status</dt><dd>Live demo</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+      </dl>
+    </article>
+    <article class="project reveal">
+      <span class="pidx">P&#8209;02</span>
+      <div>
         <h3><a href="datum.html">Datum &mdash; Construction PM <span class="live">Live demo &rarr;</span></a></h3>
         <p>A project management workspace built for how a contractor actually runs work: projects and contract value, activity schedules with a Gantt view, milestones, a punch list by severity and trade, daily site logs with weather and manpower, and RFI tracking. One dashboard surfaces what&rsquo;s overdue, at risk, or waiting on an answer. Single file, no backend, no login &mdash; data lives in the browser.</p>
       </div>
       <dl class="spec">
         <div><dt>Role</dt><dd>Design &amp; build</dd></div>
         <div><dt>Stack</dt><dd>HTML, JS &middot; no backend</dd></div>
-        <div class="status"><dt>Status</dt><dd>Live demo</dd></div>
-        <div><dt>Year</dt><dd>2026</dd></div>
-      </dl>
-    </article>
-
-    <article class="project reveal">
-      <span class="pidx">P&#8209;02</span>
-      <div>
-        <h3><a href="estimator.html">Cabinet Estimating Suite <span class="live">Live demo &rarr;</span></a></h3>
-        <p>Seven single-file web tools that turn a room sketch into an itemized, auditable estimate &mdash; a drawing canvas, automatic quantity takeoff, and a priced bill of materials with markup and contingency logic built in. Covers kitchens, closets, restroom partitions, vanities, media walls, office casework and bar units. In daily use for live bidding.</p>
-      </div>
-      <dl class="spec">
-        <div><dt>Role</dt><dd>Design &amp; build</dd></div>
-        <div><dt>Stack</dt><dd>HTML, JS, SVG &middot; no backend</dd></div>
         <div class="status"><dt>Status</dt><dd>Live demo</dd></div>
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
@@ -752,10 +765,23 @@
     <p class="lede reveal">Every one of these is built and running inside a real construction business today. The service is putting the same three things &mdash; the data reading, the memory, the drafting &mdash; to work inside yours, wired to how you already operate rather than bolted on beside it.</p>
   </section>
 
+  <!-- PILOT -->
+  <section id="pilot" aria-labelledby="pilot-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;05</span>
+      <h2 id="pilot-h">Pilot program</h2>
+    </div>
+    <p class="lede reveal">I&rsquo;m taking on <strong>three millwork or casework shops before October&nbsp;31,&nbsp;2026</strong> to run the estimating suite on real bids. I configure it to your cost book and product lines at no setup cost; in exchange, a short written case study and a reference call once it is saving you time at the desk. After the three slots, it moves to standard pricing.</p>
+    <div class="cta-row reveal" style="margin-top:1.6rem">
+      <a class="btn primary" href="mailto:bernados.jason@gmail.com?subject=Estimating%20pilot%20%E2%80%94%20%5Byour%20shop%5D">Apply for a pilot slot <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <a class="btn ghost" href="estimator.html">Try the estimator first</a>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <section id="contact" class="contact" aria-labelledby="contact-h">
     <div class="s-head reveal">
-      <span class="idx">A&#8209;05</span>
+      <span class="idx">A&#8209;06</span>
       <h2 id="contact-h">Contact</h2>
     </div>
     <p class="lede reveal">Available for SaaS and automation work, remote, with clients in the US. Best fit is anything where construction or manufacturing domain knowledge is the hard part, and where AI does real work rather than decoration. The fastest way to reach me is email.</p>
@@ -769,7 +795,7 @@
 
   <footer>
     <span>Jason Bernados &middot; 2026</span>
-    <span>Drawn as a single HTML file &middot; no trackers</span>
+    <span>Single HTML file &middot; no cookies</span>
   </footer>
 
 </main>
