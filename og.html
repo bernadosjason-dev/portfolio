@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>og</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{
+    background:#F3F4F1;
+    font-family:"Hanken Grotesk",system-ui,sans-serif;
+    color:#1B1E1B;
+    position:relative;
+  }
+  body::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(#D8D9D1 1px,transparent 1px),
+      linear-gradient(90deg,#D8D9D1 1px,transparent 1px);
+    background-size:44px 44px;
+    opacity:.55;
+    -webkit-mask-image:radial-gradient(ellipse 120% 90% at 30% 0%,#000 45%,transparent 100%);
+            mask-image:radial-gradient(ellipse 120% 90% at 30% 0%,#000 45%,transparent 100%);
+  }
+  .frame{position:absolute;inset:22px;border:1px solid #B7B8AE}
+  .frame::before{content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;border:1px solid #B7B8AE;border-right:0;border-bottom:0}
+  .frame::after{content:"";position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border:1px solid #B7B8AE;border-left:0;border-top:0}
+  .pad{position:absolute;inset:22px;padding:64px 72px;display:flex;flex-direction:column}
+  .eyebrow{font-family:"JetBrains Mono",monospace;font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:#83877C}
+  h1{font-family:"Archivo",sans-serif;font-weight:800;font-size:104px;line-height:.95;letter-spacing:-.035em;margin-top:26px}
+  .role{font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:500;color:#C43D2B;margin-top:22px;letter-spacing:.01em}
+  .scope{font-size:30px;color:#45493F;margin-top:26px;max-width:34ch;line-height:1.4}
+  .index{margin-top:auto;display:flex;gap:14px 30px;flex-wrap:wrap;font-family:"JetBrains Mono",monospace;font-size:18px;color:#6A6E63}
+  .index span{display:flex;align-items:center;gap:9px}
+  .index span::before{content:"";width:7px;height:7px;background:#C43D2B}
+  .tb{position:absolute;right:44px;bottom:44px;font-family:"JetBrains Mono",monospace;font-size:16px;color:#83877C;text-align:right;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="frame"></div>
+<div class="pad">
+  <div class="eyebrow">Portfolio &nbsp;/&nbsp; 2026</div>
+  <h1>Jason Bernados</h1>
+  <div class="role">SaaS Builder &mdash; Construction Software</div>
+  <div class="scope">Estimating, pipeline, project and content tools, built by someone who has run the work they&rsquo;re built for.</div>
+  <div class="index">
+    <span>Cabinet Estimating Suite</span>
+    <span>Datum PM</span>
+    <span>Lead Pipeline</span>
+    <span>Memory Vault</span>
+    <span>Pipeline Tracker</span>
+    <span>Content Engine</span>
+  </div>
+</div>
+<div class="tb">bernadosjason-dev.github.io/portfolio<br>Remote &middot; US clients</div>
+</body>
+</html>
