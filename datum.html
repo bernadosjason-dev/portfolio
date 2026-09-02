@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Datum — Construction Project Management</title>
-<meta name="description" content="Datum: a single-file construction project management workspace — projects, schedule, milestones, punch list, daily site logs, and RFIs. Sample data: Fixboss Construction." />
+<meta name="description" content="Datum: a single-file construction project management workspace — projects, schedule, milestones, punch list, daily site logs, and RFIs. Sample data: a US millwork and casework contractor." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
@@ -361,7 +361,7 @@
 <div class="app">
   <div class="topbar">
     <span class="brandmark"><span class="dot"></span>Datum<span class="sub">Construction PM</span></span>
-    <span class="company" id="companyName">Fixboss Construction</span>
+    <span class="company" id="companyName">Meridian Millwork</span>
     <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
     <button class="iconbtn" id="dataBtn" title="Data &amp; backup" aria-label="Data and backup">⋯</button>
   </div>
@@ -404,16 +404,16 @@
     var d = parseD(s);
     return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
-  function fmtPHP(n) {
+  function fmtUSD(n) {
     n = Number(n) || 0;
-    return "₱" + n.toLocaleString("en-PH");
+    return "$" + n.toLocaleString("en-US");
   }
-  function fmtPHPShort(n) {
+  function fmtUSDShort(n) {
     n = Number(n) || 0;
-    if (n >= 1e9) return "₱" + (n / 1e9).toFixed(1) + "B";
-    if (n >= 1e6) return "₱" + (n / 1e6).toFixed(1) + "M";
-    if (n >= 1e3) return "₱" + Math.round(n / 1e3) + "k";
-    return "₱" + n;
+    if (n >= 1e9) return "$" + (n / 1e9).toFixed(1) + "B";
+    if (n >= 1e6) return "$" + (n / 1e6).toFixed(2) + "M";
+    if (n >= 1e3) return "$" + Math.round(n / 1e3) + "K";
+    return "$" + n;
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -458,7 +458,7 @@
     "medium": { label: "Medium", cls: "warn" },
     "high":   { label: "High",   cls: "bad" }
   };
-  var PHASES = ["Mobilization", "Earthworks", "Substructure", "Superstructure", "MEP Rough-in", "Finishes", "Testing & Commissioning", "Handover"];
+  var PHASES = ["Preconstruction", "Shop Drawings", "Submittals & Approvals", "Procurement", "Fabrication", "Finishing", "Delivery", "Installation", "Punch & Closeout"];
 
   function chip(map, key) {
     var m = map[key] || { label: key || "—", cls: "idle" };
@@ -468,98 +468,98 @@
   // ============================================================ seed data
   function seed() {
     var P = [
-      { id: "p1", code: "FB-24-014", name: "Pueblo Commercial Center", client: "Pueblo de Oro Development Corp.", location: "Uptown, Cagayan de Oro", value: 185000000, startDate: dISO(-210), targetDate: dISO(120), pm: "Engr. R. Villanueva", status: "active" },
-      { id: "p2", code: "FB-25-003", name: "Opol Barangay Road Concreting", client: "DPWH Misamis Oriental 1st DEO", location: "Opol, Misamis Oriental", value: 48000000, startDate: dISO(-140), targetDate: dISO(35), pm: "Engr. J. Bernados", status: "active" },
-      { id: "p3", code: "FB-25-011", name: "Fixboss Warehouse & Equipment Yard", client: "Fixboss Construction (in-house)", location: "Tagoloan, Misamis Oriental", value: 22000000, startDate: dISO(-70), targetDate: dISO(95), pm: "Engr. J. Bernados", status: "active" },
-      { id: "p4", code: "FB-25-007", name: "Hillside Residences — Phase 2", client: "Hillside Land Corp.", location: "El Salvador City", value: 96000000, startDate: dISO(-55), targetDate: dISO(210), pm: "Engr. M. Dizon", status: "on-hold" }
+      { id: "p1", code: "MM-25-041", name: "Northgate Medical Plaza — Casework Package", client: "Brennan Construction Group", location: "Austin, TX", value: 1240000, startDate: dISO(-210), targetDate: dISO(120), pm: "R. Delgado", status: "active" },
+      { id: "p2", code: "MM-25-058", name: "Riverbend Apartments Bldg C — Unit Casework", client: "Halcyon Residential", location: "San Marcos, TX", value: 685000, startDate: dISO(-140), targetDate: dISO(35), pm: "J. Whitfield", status: "active" },
+      { id: "p3", code: "MM-25-066", name: "Cedar & Vine — Restaurant Millwork & Bar", client: "Cedar Hospitality Group", location: "Round Rock, TX", value: 312000, startDate: dISO(-70), targetDate: dISO(95), pm: "J. Whitfield", status: "active" },
+      { id: "p4", code: "MM-25-071", name: "Lakeline Corporate Center — TI Millwork", client: "Vantage Builders", location: "Cedar Park, TX", value: 940000, startDate: dISO(-55), targetDate: dISO(210), pm: "M. Okafor", status: "on-hold" }
     ];
     var T = [
       // p1
-      t("p1", "Site mobilization & temporary facilities", "Mobilization", "Foreman D. Ang", -210, -190, "done", 100),
-      t("p1", "Bulk excavation & shoring", "Earthworks", "Sub: EarthPro", -188, -150, "done", 100),
-      t("p1", "Mat foundation & pile caps", "Substructure", "Engr. R. Villanueva", -150, -95, "done", 100),
-      t("p1", "Columns & slab — L1 to L4", "Superstructure", "Engr. R. Villanueva", -95, 10, "in-progress", 72),
-      t("p1", "MEP rough-in — L1 to L3", "MEP Rough-in", "Sub: MEPTech", -30, 55, "in-progress", 40),
-      t("p1", "Curtain wall & glazing", "Finishes", "Sub: GlazeCo", 20, 100, "not-started", 0),
-      t("p1", "Interior fit-out & painting", "Finishes", "Foreman D. Ang", 60, 115, "not-started", 0),
-      t("p1", "Testing, commissioning & turnover", "Testing & Commissioning", "Engr. R. Villanueva", 105, 120, "not-started", 0),
+      t("p1", "Field verify & site dimensions", "Preconstruction", "R. Delgado", -210, -190, "done", 100),
+      t("p1", "Shop drawings — Levels 1-3 casework", "Shop Drawings", "Drafting: K. Moreau", -188, -150, "done", 100),
+      t("p1", "Submittals & finish samples to architect", "Submittals & Approvals", "R. Delgado", -150, -95, "done", 100),
+      t("p1", "Panel & hardware procurement", "Procurement", "Purchasing: T. Ruiz", -95, 10, "in-progress", 72),
+      t("p1", "Fabrication — exam room casework, 46 units", "Fabrication", "Shop: Line 2", -30, 55, "in-progress", 40),
+      t("p1", "Finishing & edgebanding", "Finishing", "Shop: Finish Dept", 20, 100, "not-started", 0),
+      t("p1", "Delivery & installation — Levels 1-3", "Installation", "Install crew A", 60, 115, "not-started", 0),
+      t("p1", "Punch list & closeout documents", "Punch & Closeout", "R. Delgado", 105, 120, "not-started", 0),
       // p2
-      t("p2", "Clearing, grubbing & staking", "Earthworks", "Foreman L. Paz", -140, -125, "done", 100),
-      t("p2", "Subgrade preparation & embankment", "Earthworks", "Sub: RoadWorks MO", -125, -80, "done", 100),
-      t("p2", "Aggregate subbase course", "Substructure", "Sub: RoadWorks MO", -85, -45, "done", 100),
-      t("p2", "PCCP paving — STA 0+000 to 2+100", "Superstructure", "Engr. J. Bernados", -50, 5, "in-progress", 84),
-      t("p2", "RCPC lines & catch basins", "Substructure", "Foreman L. Paz", -40, 10, "in-progress", 66),
-      t("p2", "Shoulder, lane marking & signage", "Finishes", "Sub: RoadWorks MO", 0, 30, "not-started", 0),
-      t("p2", "As-built & DPWH final inspection", "Handover", "Engr. J. Bernados", 25, 35, "not-started", 0),
+      t("p2", "Unit type takeoff — 184 units", "Preconstruction", "J. Whitfield", -140, -125, "done", 100),
+      t("p2", "Shop drawings — kitchen & vanity typicals", "Shop Drawings", "Drafting: K. Moreau", -125, -80, "done", 100),
+      t("p2", "Material release — melamine & solid surface", "Procurement", "Purchasing: T. Ruiz", -85, -45, "done", 100),
+      t("p2", "Fabrication — kitchen cabinets, Bldg C", "Fabrication", "Shop: Line 1", -50, 5, "in-progress", 84),
+      t("p2", "Fabrication — vanities & linen cabinets", "Fabrication", "Shop: Line 1", -40, 10, "in-progress", 66),
+      t("p2", "Install — floors 1 through 4", "Installation", "Install crew B", 0, 30, "not-started", 0),
+      t("p2", "Punch walk with GC & closeout", "Punch & Closeout", "J. Whitfield", 25, 35, "not-started", 0),
       // p3
-      t("p3", "Survey, layout & site grading", "Earthworks", "Foreman L. Paz", -70, -55, "done", 100),
-      t("p3", "Isolated footings & grade beams", "Substructure", "Engr. J. Bernados", -55, -20, "done", 100),
-      t("p3", "Slab on grade & pedestals", "Substructure", "Engr. J. Bernados", -25, 5, "in-progress", 78),
-      t("p3", "PEB steel erection", "Superstructure", "Sub: SteelFab Cebu", -5, 45, "blocked", 15),
-      t("p3", "Roofing, cladding & louvers", "Finishes", "Sub: SteelFab Cebu", 35, 70, "not-started", 0),
-      t("p3", "Electrical, lighting & yard paving", "MEP Rough-in", "Sub: MEPTech", 40, 88, "not-started", 0),
+      t("p3", "Design intent review with owner", "Preconstruction", "J. Whitfield", -70, -55, "done", 100),
+      t("p3", "Shop drawings — bar & back bar", "Shop Drawings", "Drafting: K. Moreau", -55, -20, "done", 100),
+      t("p3", "Fabrication — banquettes & wall paneling", "Fabrication", "Shop: Line 2", -25, 5, "in-progress", 78),
+      t("p3", "Solid surface bar top — outsourced", "Procurement", "Sub: Lonestar Surfaces", -5, 45, "blocked", 15),
+      t("p3", "Finishing — stain & catalyzed lacquer", "Finishing", "Shop: Finish Dept", 35, 70, "not-started", 0),
+      t("p3", "Delivery & field installation", "Installation", "Install crew A", 40, 88, "not-started", 0),
       // p4
-      t("p4", "Site clearing & road right-of-way", "Earthworks", "Sub: EarthPro", -55, -30, "blocked", 45),
-      t("p4", "Model unit foundations (Block A)", "Substructure", "Engr. M. Dizon", -20, 25, "not-started", 0),
-      t("p4", "Block A structure — 8 units", "Superstructure", "Engr. M. Dizon", 20, 120, "not-started", 0),
-      t("p4", "Site development & drainage", "Earthworks", "Sub: EarthPro", 30, 150, "not-started", 0)
+      t("p4", "Field verify — tenant floors 4-6", "Preconstruction", "M. Okafor", -55, -30, "blocked", 45),
+      t("p4", "Shop drawings — reception & conference", "Shop Drawings", "Drafting: K. Moreau", -20, 25, "not-started", 0),
+      t("p4", "Fabrication — reception desk & credenzas", "Fabrication", "Shop: Line 2", 20, 120, "not-started", 0),
+      t("p4", "Installation — floors 4 through 6", "Installation", "Install crew B", 30, 150, "not-started", 0)
     ];
     function t(projectId, name, phase, assignee, s, f, status, progress) {
       return { id: uid(), projectId: projectId, name: name, phase: phase, assignee: assignee, start: dISO(s), finish: dISO(f), status: status, progress: progress };
     }
     var M = [
-      m("p1", "Topping-out — Level 4 slab", 14, "at-risk"),
-      m("p1", "Building watertight", 70, "upcoming"),
+      m("p1", "Shop drawings approved", -95, "met"),
+      m("p1", "Material on hand — Levels 1-3", 14, "at-risk"),
+      m("p1", "Fabrication complete", 70, "upcoming"),
       m("p1", "Substantial completion", 118, "upcoming"),
-      m("p1", "Foundation complete", -95, "met"),
-      m("p2", "50% physical accomplishment", -20, "met"),
-      m("p2", "Paving complete — full stretch", 8, "at-risk"),
-      m("p2", "Project turnover to DPWH", 35, "upcoming"),
-      m("p3", "Foundation & SOG complete", 6, "at-risk"),
-      m("p3", "Steel erection complete", 45, "upcoming"),
-      m("p4", "Right-of-way cleared", -5, "missed"),
-      m("p4", "Model units ready for viewing", 90, "upcoming")
+      m("p2", "First 4 floors released to install", -20, "met"),
+      m("p2", "Bldg C fabrication complete", 8, "at-risk"),
+      m("p2", "Final walk & closeout", 35, "upcoming"),
+      m("p3", "Bar top template approved", 6, "at-risk"),
+      m("p3", "Restaurant opening — hard date", 45, "upcoming"),
+      m("p4", "Field dimensions released", -5, "missed"),
+      m("p4", "Tenant floors ready for install", 90, "upcoming")
     ];
     function m(projectId, name, off, status) { return { id: uid(), projectId: projectId, name: name, date: dISO(off), status: status }; }
     var PU = [
-      pu("p1", "L2 — Grid C/4", "Honeycomb on column face, ~0.3 m²", "Concrete", -12, 5, "high", "open"),
-      pu("p1", "L1 lobby", "Slab level out of tolerance (+12 mm)", "Concrete", -9, 8, "medium", "in-progress"),
-      pu("p1", "L3 — east curtain line", "Embed plates misaligned, 4 nos.", "Steel", -6, 10, "high", "open"),
-      pu("p1", "Perimeter", "Temporary drainage ponding after rain", "Civil", -20, -6, "low", "closed"),
-      pu("p2", "STA 1+250", "Surface crack on PCCP panel, transverse", "Concrete", -8, 6, "high", "open"),
-      pu("p2", "STA 0+780", "Catch basin invert 40 mm high", "Civil", -5, 7, "medium", "in-progress"),
-      pu("p2", "STA 1+900", "Missing expansion joint sealant, 3 panels", "Concrete", -3, 12, "low", "open"),
-      pu("p3", "Gridline 2", "Anchor bolt projection short by 15 mm", "Steel", -4, 9, "high", "open"),
-      pu("p3", "SOG bay 4", "Curing not maintained, surface dusting", "Concrete", -2, 5, "medium", "open"),
-      pu("p4", "Access road", "Erosion at cut slope, needs matting", "Civil", -10, -2, "medium", "closed")
+      pu("p1", "L2 — Exam 214", "Base cabinet 1/2\" out of level, shim required", "Millwork", -12, 5, "high", "open"),
+      pu("p1", "L1 — Reception", "Solid surface seam visible at return, needs refinish", "Solid Surface", -9, 8, "medium", "in-progress"),
+      pu("p1", "L3 — Nurse station", "Wrong pull hardware installed, 14 doors", "Hardware", -6, 10, "high", "open"),
+      pu("p1", "L1 — Corridor A", "Edgebanding lifted on 3 upper cabinets", "Millwork", -20, -6, "low", "closed"),
+      pu("p2", "Unit 314", "Cabinet door reveal inconsistent, whole run", "Millwork", -8, 6, "high", "open"),
+      pu("p2", "Unit 208", "Vanity top overhang short 3/4\"", "Solid Surface", -5, 7, "medium", "in-progress"),
+      pu("p2", "Unit 402", "Missing toe kick, 2 LF", "Millwork", -3, 12, "low", "open"),
+      pu("p3", "Bar — north end", "Field dimension conflict with structural column", "Millwork", -4, 9, "high", "open"),
+      pu("p3", "Banquette run B", "Stain color off from approved sample", "Finish", -2, 5, "medium", "open"),
+      pu("p4", "Floor 5 — Reception", "Blocking not installed by GC, install held", "Coordination", -10, -2, "medium", "closed")
     ];
     function pu(projectId, location, description, trade, raised, due, severity, status) {
       return { id: uid(), projectId: projectId, location: location, description: description, trade: trade, raised: dISO(raised), due: dISO(due), severity: severity, status: status };
     }
     var L = [
-      lg("p1", -1, "Cloudy, brief rain PM", 68, "Continued L4 column formwork (Grids A–D). Rebar delivery received, 12 t. Concrete pour for L3 slab section 2 completed, 46 m³.", "Rain stopped pour for ~1 hr. No lost time claimed."),
-      lg("p1", -3, "Fair", 74, "L4 column rebar cage fabrication. MEP sleeves installed L2. Survey check on L3 slab levels.", ""),
-      lg("p2", -1, "Hot, clear", 32, "PCCP paving STA 1+950–2+100. Curing of previous day's pour ongoing. RCPC laying STA 0+900.", "Water truck breakdown 2 hrs, curing water hauled manually."),
-      lg("p2", -2, "Fair", 30, "Paving STA 1+800–1+950. Joint sawing on 3-day panels. Shoulder prep STA 0+000–0+400.", ""),
-      lg("p3", -1, "Overcast", 18, "SOG pour bay 3 (22 m³). Awaiting steel delivery — still in transit from Cebu. Yard grading continued.", "Steel erection idle — 2nd day. Sub notified in writing."),
-      lg("p4", -6, "Fair", 6, "Skeleton crew only. Clearing suspended pending ROW resolution with two lot owners. Silt fence maintenance.", "Work suspended — ROW. Awaiting legal / client action.")
+      lg("p1", -1, "82°F, clear", 14, "Install crew A on Level 2, exam rooms 210-218. Set 22 base cabinets and 14 uppers. Received panel delivery, 2 units of maple veneer core.", "GC blocking missing in rooms 216-218. Install skipped ahead, will backtrack."),
+      lg("p1", -3, "88°F, humid", 16, "Level 1 reception casework set and scribed. Solid surface template taken for reception transaction top.", ""),
+      lg("p2", -1, "91°F, clear", 11, "Shop Line 1 running Bldg C kitchen boxes — 34 completed. Edgebander down for 90 min, belt change.", "Edgebander downtime 1.5 hrs. Maintenance scheduled Friday."),
+      lg("p2", -2, "86°F, partly cloudy", 12, "Kitchen boxes 28 completed. Vanity cabinet parts cut and banded for floors 1-2.", ""),
+      lg("p3", -1, "79°F, overcast", 6, "Banquette frames assembled, wall paneling milled. Bar top still with Lonestar Surfaces — no ship date confirmed.", "Bar top vendor 2 weeks late. Opening date at risk, GC notified in writing."),
+      lg("p4", -6, "84°F, clear", 2, "Project on hold. Drafting only — no shop or field activity. Awaiting released field dimensions from GC.", "Hold continues. Tenant floors not turned over by GC as scheduled.")
     ];
     function lg(projectId, off, weather, manpower, work, issues) {
       return { id: uid(), projectId: projectId, date: dISO(off), weather: weather, manpower: manpower, work: work, issues: issues };
     }
     var R = [
-      rfi("p1", "RFI-041", "Column C4 rebar congestion at beam-column joint", "Structural Consultant", -10, -3, "open", ""),
-      rfi("p1", "RFI-039", "Curtain wall embed plate revised elevation", "Architect", -16, -9, "answered", "Use revised detail A-503 rev.2, issued " + fmtDate(dISO(-8)) + "."),
-      rfi("p1", "RFI-035", "Substitution: waterproofing membrane brand", "Architect", -28, -20, "closed", "Approved equal accepted. See transmittal T-112."),
-      rfi("p2", "RFI-018", "PCCP panel crack STA 1+250 — repair vs replace", "DPWH Materials Engineer", -7, 0, "open", ""),
-      rfi("p2", "RFI-015", "Additional catch basin at low point STA 1+400", "DPWH Project Engineer", -14, -7, "answered", "Approved as variation. Proceed, quantities to follow."),
-      rfi("p3", "RFI-006", "Anchor bolt template tolerance for PEB", "PEB Supplier", -5, 2, "open", ""),
-      rfi("p4", "RFI-003", "Revised grading at Block A due to ROW change", "Civil Consultant", -12, -5, "open", "")
+      rfi("p1", "RFI-041", "Exam room base cabinet depth vs. plumbing rough-in conflict", "Architect", -10, -3, "open", ""),
+      rfi("p1", "RFI-039", "Reception transaction top height — ADA clarification", "Architect", -16, -9, "answered", "Lower section to 34\" AFF per revised detail A-503 rev.2, issued " + fmtDate(dISO(-8)) + "."),
+      rfi("p1", "RFI-035", "Substitution request: alternate plastic laminate", "Architect", -28, -20, "closed", "Approved as equal. See submittal log item 112."),
+      rfi("p2", "RFI-018", "Unit 314 cabinet run — dimension conflict with as-built wall", "GC — Halcyon Residential", -7, 0, "open", ""),
+      rfi("p2", "RFI-015", "Added linen cabinet, units 401-418", "GC — Halcyon Residential", -14, -7, "answered", "Approved as change order. Proceed, pricing to follow."),
+      rfi("p3", "RFI-006", "Bar top seam location and support requirements", "Sub: Lonestar Surfaces", -5, 2, "open", ""),
+      rfi("p4", "RFI-003", "Reception desk layout revised after tenant change", "Vantage Builders", -12, -5, "open", "")
     ];
     function rfi(projectId, number, subject, to, raised, needed, status, response) {
       return { id: uid(), projectId: projectId, number: number, subject: subject, to: to, raised: dISO(raised), needed: dISO(needed), status: status, response: response };
     }
-    return { company: "Fixboss Construction", projects: P, tasks: T, milestones: M, punch: PU, logs: L, rfis: R, savedAt: new Date().toISOString() };
+    return { company: "Meridian Millwork", projects: P, tasks: T, milestones: M, punch: PU, logs: L, rfis: R, savedAt: new Date().toISOString() };
   }
 
   // ============================================================ store
@@ -659,7 +659,7 @@
 
     var kpi = [
       ["Active projects", active.length, projects.length + " total"],
-      ["Contract value — active", fmtPHPShort(value), "portfolio"],
+      ["Contract value — active", fmtUSDShort(value), "portfolio"],
       ["Portfolio progress", prog + "%", "weighted mean"],
       ["Overdue tasks", overdueTasks.length, overdueTasks.length ? "needs attention" : "clear", overdueTasks.length > 0],
       ["Open punch items", openPunch.length, highPunch.length + " high severity", highPunch.length > 0],
@@ -698,7 +698,7 @@
       return '<tr onclick="location.hash=\'#/project/' + p.id + '\'" style="cursor:pointer">' +
         '<td><span class="mono muted">' + esc(p.code) + '</span><br><strong>' + esc(p.name) + '</strong></td>' +
         '<td>' + chip(PROJ_STATUS, p.status) + '</td>' +
-        '<td class="num">' + fmtPHPShort(p.value) + '</td>' +
+        '<td class="num">' + fmtUSDShort(p.value) + '</td>' +
         '<td class="num">' + fmtDate(p.targetDate) + '</td>' +
         '<td><div class="with-bar"><div class="bar' + (pr === 100 ? ' ok' : '') + '"><span style="width:' + pr + '%"></span></div><span class="n">' + pr + '%</span></div></td>' +
         '</tr>';
@@ -730,7 +730,7 @@
         '<span class="code">' + esc(p.code) + '</span>' +
         '<h3>' + esc(p.name) + '</h3>' +
         '<div>' + chip(PROJ_STATUS, p.status) + '</div>' +
-        '<div class="meta"><span>' + esc(p.client) + '</span><span>' + esc(p.location) + '</span><span>' + fmtPHP(p.value) + ' · ' + tcount + ' activities</span></div>' +
+        '<div class="meta"><span>' + esc(p.client) + '</span><span>' + esc(p.location) + '</span><span>' + fmtUSD(p.value) + ' · ' + tcount + ' activities</span></div>' +
         '<div class="with-bar"><div class="bar' + (pr === 100 ? ' ok' : '') + '"><span style="width:' + pr + '%"></span></div><span class="n">' + pr + '% · target ' + fmtDate(p.targetDate) + '</span></div>' +
         '</button>';
     }).join("");
@@ -773,7 +773,7 @@
     var openRfi = coll("rfis").filter(function (x) { return x.projectId === p.id && x.status === "open"; }).length;
     return '<div class="facts">' +
       f("Status", chip(PROJ_STATUS, p.status)) +
-      f("Contract value", fmtPHP(p.value)) +
+      f("Contract value", fmtUSD(p.value)) +
       f("Project manager", esc(p.pm)) +
       f("Start", fmtDate(p.startDate)) +
       f("Target completion", fmtDate(p.targetDate)) +
@@ -885,7 +885,7 @@
       .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
     var cards = ls.map(function (l) {
       return '<div class="logcard"><header><span class="date">' + fmtDate(l.date) + '</span>' +
-        '<span class="kv">Weather: ' + esc(l.weather) + '</span><span class="kv">Manpower: ' + esc(l.manpower) + '</span>' +
+        '<span class="kv">Weather: ' + esc(l.weather) + '</span><span class="kv">Crew: ' + esc(l.manpower) + '</span>' +
         '<span class="spacer" style="flex:1"></span>' +
         '<span class="rowact" style="opacity:1"><button class="btn sm ghost" onclick="openForm(\'logs\',\'' + l.id + '\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'logs\',\'' + l.id + '\')">Del</button></span></header>' +
         '<p>' + esc(l.work) + '</p>' +
@@ -954,7 +954,7 @@
       { k: "code", label: "Project code", type: "text" },
       { k: "client", label: "Client", type: "text" },
       { k: "location", label: "Location", type: "text" },
-      { k: "value", label: "Contract value (₱)", type: "number" },
+      { k: "value", label: "Contract value (USD)", type: "number" },
       { k: "pm", label: "Project manager", type: "text" },
       { k: "startDate", label: "Start date", type: "date", row: true },
       { k: "targetDate", label: "Target completion", type: "date", row: true },
@@ -986,7 +986,7 @@
     logs: { title: "Daily log", fields: [
       { k: "date", label: "Date", type: "date", row: true },
       { k: "weather", label: "Weather", type: "text", row: true },
-      { k: "manpower", label: "Manpower on site", type: "number" },
+      { k: "manpower", label: "Crew on site", type: "number" },
       { k: "work", label: "Work performed", type: "textarea", req: true },
       { k: "issues", label: "Issues / delays", type: "textarea" }
     ]},
@@ -1113,7 +1113,7 @@
     } catch (e) { toast("Download not available here — use Copy JSON"); }
   };
   window.resetData = function () {
-    if (!confirm("Replace everything with the original Fixboss sample data?")) return;
+    if (!confirm("Replace everything with the original sample data?")) return;
     state = seed(); persist(state); closeForm(); go("#/dashboard"); render(); toast("Sample data restored");
   };
 
