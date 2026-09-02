@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Content Engine</title>
+<meta name="description" content="A month of social content for a construction business in one pass — a posting calendar, ready-to-paste captions across six pillars, and reel scripts for the video slots. Interactive demo." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root{
+    --paper:#F3F4F1; --surface:#FFFFFF; --surface-2:#ECEEE9; --hover:#E7E9E3;
+    --ink:#1B1E1B; --ink-2:#45493F; --ink-3:#6A6E63;
+    --line:#D3D5CC; --line-2:#E1E2DB;
+    --brand:#C43D2B; --brand-ink:#FFFFFF;
+    --ok:#2F7D4F; --ok-bg:#E4F0E7; --warn:#A9701A; --warn-bg:#F6ECD9;
+    --idle:#6A6E63; --idle-bg:#E7E8E2; --focus:#C43D2B;
+    --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --s-1:0.78rem; --s0:0.94rem; --s1:1.1rem; --s2:1.35rem; --s3:1.7rem; --s4:2.2rem;
+    --radius:3px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+      --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+      --brand:#E4573F; --brand-ink:#17140F;
+      --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+      --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+    --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+    --brand:#E4573F; --brand-ink:#17140F;
+    --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+    --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:var(--font-body);font-size:var(--s0);line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;margin:0}
+  button{font:inherit;cursor:pointer} a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  input,select{font:inherit;color:inherit}
+  .mono{font-family:var(--font-mono)} .muted{color:var(--ink-3)}
+  .app{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+  .topbar{display:flex;align-items:center;gap:1rem;padding:0 clamp(1rem,3vw,2rem);height:60px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brandmark{display:flex;align-items:baseline;gap:0.55rem;font-family:var(--font-display);font-weight:800;font-size:var(--s2);letter-spacing:-0.02em}
+  .brandmark .dot{width:9px;height:9px;background:var(--brand);display:inline-block;transform:translateY(-1px)}
+  .brandmark .sub{font-family:var(--font-mono);font-weight:400;font-size:var(--s-1);color:var(--ink-3)}
+  .tb-spacer{margin-left:auto}
+  .iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:var(--radius)}
+  .iconbtn:hover{background:var(--hover);color:var(--ink)}
+  main{padding:clamp(1.1rem,3vw,2rem);min-width:0;max-width:1080px;margin:0 auto;width:100%}
+
+  .page-head{margin-bottom:1.3rem}
+  .page-head .eyebrow{font-family:var(--font-mono);font-size:var(--s-1);color:var(--brand);letter-spacing:0.06em;text-transform:uppercase}
+  .page-head h1{font-size:var(--s4);line-height:1.05;margin-top:0.15rem}
+  .page-head p{margin:0.5rem 0 0;color:var(--ink-2);max-width:64ch}
+
+  .setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.8rem;align-items:end;padding:1rem 1.1rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:1rem}
+  .sf{display:grid;gap:0.3rem}
+  .sf label{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3)}
+  .sf input,.sf select{padding:0.5rem 0.6rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);width:100%}
+  .genrow{display:flex;gap:0.7rem;flex-wrap:wrap;margin-bottom:1.3rem}
+  .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;font-family:var(--font-mono);font-size:var(--s-1);letter-spacing:0.02em;border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:var(--radius);transition:background .15s,transform .15s}
+  .btn:hover{background:var(--brand);border-color:var(--brand);color:#fff;transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--hover);color:var(--ink);border-color:var(--ink-3)}
+
+  .tabs{display:flex;gap:0.2rem;border-bottom:1px solid var(--line);margin-bottom:1.3rem}
+  .tabs button{padding:0.6rem 0.9rem;background:transparent;border:0;font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);border-bottom:2px solid transparent}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+
+  /* calendar */
+  .weeks{display:grid;gap:0.8rem}
+  .week{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+  .week>header{padding:0.55rem 0.9rem;border-bottom:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em}
+  .week .days{display:grid;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:640px){.week .days{grid-template-columns:1fr}}
+  .day{padding:0.75rem 0.9rem;border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+  .day:nth-child(3n){border-right:0}
+  .day .dn{font-family:var(--font-mono);font-size:0.66rem;color:var(--ink-3)}
+  .day .pill{display:inline-block;margin-top:0.25rem;font-family:var(--font-mono);font-size:0.62rem;padding:0.08rem 0.4rem;border-radius:100px;background:var(--surface-2);color:var(--ink-2)}
+  .day .pill.reel{background:var(--warn-bg);color:var(--warn)}
+  .day .hook{margin-top:0.35rem;font-size:0.84rem;line-height:1.3}
+
+  /* posts */
+  .post{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);margin-bottom:0.8rem;overflow:hidden}
+  .post>header{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border-bottom:1px solid var(--line-2)}
+  .post>header .badge{font-family:var(--font-mono);font-size:0.64rem;padding:0.1rem 0.45rem;border-radius:100px;background:var(--surface-2);color:var(--ink-2)}
+  .post>header .when{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-3)}
+  .post>header .sp{flex:1}
+  .post .body{padding:0.9rem;white-space:pre-wrap;font-size:0.92rem;line-height:1.55}
+  .post .tags{padding:0 0.9rem 0.9rem;font-family:var(--font-mono);font-size:0.74rem;color:var(--ink-3)}
+  .copybtn{font-family:var(--font-mono);font-size:0.68rem;padding:0.25rem 0.55rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink-2)}
+  .copybtn:hover{background:var(--hover);color:var(--ink)}
+
+  /* reels */
+  .reel-c{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);margin-bottom:0.9rem;overflow:hidden}
+  .reel-c>header{padding:0.7rem 0.95rem;border-bottom:1px solid var(--line-2);display:flex;gap:0.6rem;align-items:center}
+  .reel-c>header h3{font-size:var(--s1)}
+  .reel-c>header .badge{font-family:var(--font-mono);font-size:0.64rem;padding:0.1rem 0.45rem;border-radius:100px;background:var(--warn-bg);color:var(--warn)}
+  .reel-c .pad{padding:0.95rem}
+  .reel-c .shots{display:grid;gap:0.5rem;margin:0.6rem 0}
+  .shot{display:grid;grid-template-columns:2.2rem 1fr;gap:0.7rem;font-size:0.88rem}
+  .shot .sn{font-family:var(--font-mono);font-size:0.7rem;color:var(--brand)}
+  .shot .ost{display:block;font-family:var(--font-mono);font-size:0.74rem;color:var(--ink-3);margin-top:0.15rem}
+  .reel-c .cap{margin-top:0.7rem;padding-top:0.7rem;border-top:1px solid var(--line-2);white-space:pre-wrap;font-size:0.88rem}
+  .reel-c .disc{margin-top:0.5rem;font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-3)}
+
+  .note{font-size:0.82rem;color:var(--ink-3);margin-top:1.4rem;max-width:64ch;line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:0.6rem 1rem;font-family:var(--font-mono);font-size:var(--s-1);border-radius:var(--radius);opacity:0;transition:opacity .2s,transform .2s;z-index:80;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer.appfoot{padding:1.4rem clamp(1rem,3vw,2rem);border-top:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);display:flex;gap:1rem 1.5rem;flex-wrap:wrap;justify-content:space-between}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="brandmark"><span class="dot"></span>Cadence<span class="sub">Content Engine</span></span>
+    <span class="tb-spacer"></span>
+    <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+  <main>
+    <div class="page-head">
+      <div class="eyebrow">Content service · live demo</div>
+      <h1>A month of content in one pass</h1>
+      <p>Tell it what the business does. It returns a posting calendar with the pillar mix already balanced, a ready-to-paste caption for every slot, and a shot-by-shot script for the video posts. This is the deliverable a content retainer produces each month &mdash; generated here from templates, so you can see the shape of it.</p>
+    </div>
+
+    <div class="setup">
+      <div class="sf"><label for="trade">Business type</label>
+        <select id="trade">
+          <option value="millwork">Architectural millwork shop</option>
+          <option value="kb">Kitchen &amp; bath dealer</option>
+          <option value="remodel">Design-build remodeler</option>
+          <option value="closet">Closet &amp; storage company</option>
+          <option value="gc">Commercial general contractor</option>
+        </select>
+      </div>
+      <div class="sf"><label for="co">Company name</label><input id="co" value="Meridian Millwork" /></div>
+      <div class="sf"><label for="city">City / region</label><input id="city" value="Austin, TX" /></div>
+      <div class="sf"><label for="signature">Signature offering</label><input id="signature" value="custom commercial casework" /></div>
+      <div class="sf"><label for="tone">Voice</label>
+        <select id="tone">
+          <option value="pro">Confident &amp; professional</option>
+          <option value="warm">Warm &amp; approachable</option>
+          <option value="plain">Plain &amp; no-nonsense</option>
+        </select>
+      </div>
+    </div>
+    <div class="genrow">
+      <button class="btn" id="genBtn">Generate month</button>
+      <button class="btn ghost" id="shuffleBtn" disabled>Shuffle wording</button>
+      <button class="btn ghost" id="copyAllBtn" disabled>Copy all captions</button>
+    </div>
+
+    <div id="output" style="display:none">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="cal">Calendar</button>
+        <button role="tab" aria-selected="false" data-tab="posts">Captions</button>
+        <button role="tab" aria-selected="false" data-tab="reels">Reel scripts</button>
+      </div>
+      <div id="pane"></div>
+      <p class="note" id="note"></p>
+    </div>
+  </main>
+  <footer class="appfoot">
+    <span>Cadence · content engine demo · template-generated</span>
+    <span id="footStamp"></span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s);};
+  var $$=function(s){return [].slice.call(document.querySelectorAll(s));};
+  function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("show");},1600);}
+
+  /* theme */
+  try{var st=localStorage.getItem("cadence.theme");if(st)document.documentElement.setAttribute("data-theme",st);}catch(e){}
+  $("#themeToggle").addEventListener("click",function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next=dark?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("cadence.theme",next);}catch(e){}
+  });
+
+  /* ---------- seeded RNG so shuffle is repeatable per click ---------- */
+  var seed=1;
+  function srand(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }
+  function pick(a){ return a[Math.floor(srand()*a.length)]; }
+
+  /* ---------- trade vocab ---------- */
+  var TRADE={
+    millwork:{noun:"millwork",work:"casework and architectural millwork",unit:"cabinet run",team:"the shop",
+      steps:["field measure","shop drawings","submittals","fabrication","finishing","delivery","install","punch"],
+      proof:"a GC who has us back on the next three projects",
+      tips:["how to read a millwork submittal without missing a revision","why a field-verified dimension beats a plan dimension every time","the three things that delay a casework package more than anything else","laminate vs. veneer: where each one actually belongs","what “AWI Premium Grade” changes on your invoice"]},
+    kb:{noun:"kitchen & bath",work:"kitchen and bath cabinetry",unit:"kitchen",team:"our design team",
+      steps:["consultation","measure","design","selections","order","delivery","install","reveal"],
+      proof:"a homeowner who sent us their neighbor",
+      tips:["the one kitchen measurement people always get wrong","framed vs. frameless cabinets, in plain terms","how long a cabinet order really takes, start to finish","where to spend and where to save on a kitchen","why the layout matters more than the door style"]},
+    remodel:{noun:"remodeling",work:"design-build kitchen and bath remodels",unit:"remodel",team:"our crew",
+      steps:["consult","design","estimate","permits","demo","build","finish","walkthrough"],
+      proof:"a repeat client on their second project with us",
+      tips:["what a realistic remodel timeline looks like","the questions to ask before you sign with any remodeler","why the demo phase always finds something","how a fixed-price contract actually protects you","the difference an in-house crew makes on a job"]},
+    closet:{noun:"custom storage",work:"custom closets and storage systems",unit:"closet",team:"our installers",
+      steps:["consultation","measure","design","build","delivery","install","styling","reveal"],
+      proof:"a client who had us do every closet in the house",
+      tips:["start with what you own, not the closet size","adjustable shelving is worth it — here’s why","the reach-in closet mistake almost everyone makes","how to plan a closet around hanging length","why a closet design starts with a measurement, not a catalog"]},
+    gc:{noun:"construction",work:"commercial construction",unit:"project",team:"our field team",
+      steps:["preconstruction","buyout","mobilization","structure","MEP","finishes","commissioning","closeout"],
+      proof:"an owner who negotiated the next project with us directly",
+      tips:["what preconstruction actually buys you","how a clean submittal log keeps a schedule honest","the RFI that should have been a phone call","why the punch list starts long before substantial completion","reading a schedule: float, critical path, and what to watch"]}
+  };
+  var TONE={
+    pro:{open:["Here’s how we think about it.","A note from the shop floor.","Worth saying plainly."],
+         cta:["If you’re planning one, let’s talk.","Send us the drawings — we’ll take it from there.","Reach out for a walkthrough of your project."]},
+    warm:{open:["Quick one for you.","We get asked this a lot.","Something we love about this work."],
+         cta:["Curious? Send us a message.","We’d love to hear what you’re planning.","Drop us a line — no pressure."]},
+    plain:{open:["Straight talk.","No fluff here.","The short version."],
+         cta:["Want a number? Ask us.","Message us with the details.","Get in touch and we’ll scope it."]}
+  };
+
+  /* ---------- pillar templates ---------- */
+  var PILLARS={
+    spotlight:{name:"Project Spotlight", tag:"spotlight", real:true,
+      hook:["{n} things this {unit} got right.","From measurement to install — {city}.","A {unit} we’re proud to have our name on."],
+      body:["A recent {work} project in {city}. {team} handled it end to end: {stepA}, then {stepB}, then {stepC}. The details that don’t photograph well — the ones that make it last — are the ones we spend the most time on.",
+            "This one came together over a few weeks. {Work}, start to finish, with {co}’s team on every phase from {stepA} to {stepB}. Swipe for the parts most people never see."],
+      tags:["#{cohash}","#{tradehash}","#{cityhash}","#customwork","#builtright"]},
+    tips:{name:"Tips & Education", tag:"education", real:false, reel:true,
+      hook:["{tip} — read this first.","One thing worth knowing about {noun}.","{tip}."],
+      body:["{tip}. It sounds small. It isn’t. Getting this right early is the difference between a smooth project and a stack of change orders. Here’s what we tell every client.",
+            "People ask us about this constantly, so: {tip}. The short answer is that it comes down to planning, not budget. Save this for when you’re ready to start."],
+      tags:["#{tradehash}tips","#{tradehash}","#homeprojects","#renovationtips","#{cityhash}"]},
+    build:{name:"Behind the Build", tag:"behind", real:false, reel:true,
+      hook:["How a {unit} actually gets made.","Inside {team}.","{n} steps between a drawing and an install."],
+      body:["Every {unit} we deliver moves through the same path: {stepA} → {stepB} → {stepC} → {stepD}. Nothing gets cut until the drawings are approved and the field dimensions are confirmed. That discipline is why our installs go fast.",
+            "A look at the process. {Work} isn’t built on site — it’s built to spec in the shop, then installed clean. {stepA}, {stepB}, {stepC}, and a punch walk before we call it done."],
+      tags:["#behindthebuild","#{tradehash}","#madeinusa","#craftsmanship","#{cohash}"]},
+    proof:{name:"Social Proof", tag:"proof", real:true,
+      hook:["The best review is {proof}.","Why clients come back.","We’ll let the work argue for itself."],
+      body:["The measure of a job isn’t the reveal photo — it’s whether they call you for the next one. {proof} is worth more than any ad we could run. Thank you to the teams who keep trusting {co} with their {noun}.",
+            "Repeat clients are the whole business. {proof}, and that’s the goal every time: do the work so well that the next project is a conversation, not a bid."],
+      tags:["#clientlove","#{tradehash}","#{cityhash}","#repeatclients","#{cohash}"]},
+    feature:{name:"Product / Capability", tag:"feature", real:true,
+      hook:["What {co} does best: {signature}.","{Signature}, done properly.","If you can draw it, we can build it."],
+      body:["{Signature} is where we spend most of our time, and it shows. {co} runs {work} for {city} and the surrounding area — spec-driven, shop-built, installed by {team}. One point of contact from drawing to closeout.",
+            "Our lane is {signature}. Not everything — that. {work} for contractors and owners who care about the details holding up in year five, not just at the reveal."],
+      tags:["#{tradehash}","#{signaturehash}","#{cityhash}","#commercialconstruction","#{cohash}"]},
+    cta:{name:"Offer / Booking", tag:"booking", real:true,
+      hook:["Planning a {unit}? Start here.","Have drawings? Send them.","Two weeks out on new estimates — get on the list."],
+      body:["If you have a {noun} project in {city}, {co} would like a look at it. Send the drawings or a rough scope and we’ll come back with a real number, not a guess. No obligation, no hard sell.",
+            "Booking {noun} work now. The fastest way to start: message us with your location, the scope, and your timeline. {team} will take it from there."],
+      tags:["#{cityhash}","#{tradehash}","#getaquote","#nowbooking","#{cohash}"]}
+  };
+
+  /* ---------- 4-week plan: 3 posts / week, pillar mix ---------- */
+  var PLAN=[
+    ["feature","tips","spotlight"],
+    ["build","proof","cta"],
+    ["tips","spotlight","feature"],
+    ["build","cta","proof"]
+  ];
+  var DAYS=["Mon","Wed","Fri"];
+
+  function ctx(){
+    var t=$("#trade").value, T=TRADE[t];
+    var co=$("#co").value.trim()||"Your Company";
+    var city=$("#city").value.trim()||"your area";
+    var sig=$("#signature").value.trim()||T.work;
+    var tone=$("#tone").value;
+    function hash(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,""); }
+    return {
+      t:t, T:T, co:co, city:city, sig:sig, tone:tone, TONE:TONE[tone],
+      cohash:hash(co), tradehash:hash(T.noun), cityhash:hash(city.split(",")[0]), signaturehash:hash(sig),
+      cityShort:city.split(",")[0]
+    };
+  }
+  function fill(str,c,extra){
+    extra=extra||{};
+    var steps=c.T.steps;
+    var map={
+      "{n}":"3","{co}":c.co,"{city}":c.city,"{unit}":c.T.unit,"{noun}":c.T.noun,
+      "{work}":c.T.work,"{Work}":c.T.work.charAt(0).toUpperCase()+c.T.work.slice(1),"{team}":c.T.team,"{proof}":c.T.proof,"{signature}":c.sig,"{Signature}":c.sig.charAt(0).toUpperCase()+c.sig.slice(1),
+      "{cohash}":c.cohash,"{tradehash}":c.tradehash,"{cityhash}":c.cityhash,"{signaturehash}":c.signaturehash,
+      "{stepA}":steps[0],"{stepB}":steps[1],"{stepC}":steps[2],"{stepD}":steps[3],
+      "{tip}":extra.tip||c.T.tips[0]
+    };
+    return str.replace(/\{[a-zA-Z]+\}/g,function(m){ return map[m]!=null?map[m]:m; });
+  }
+  function capFirst(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  function buildMonth(){
+    var c=ctx();
+    var tipPool=c.T.tips.slice();
+    var out=[];
+    PLAN.forEach(function(week,wi){
+      week.forEach(function(pk,di){
+        var P=PILLARS[pk];
+        var extra={};
+        if(pk==="tips"){ extra.tip=capFirst(tipPool[(wi*3+di)%tipPool.length]); }
+        var hook=fill(pick(P.hook),c,extra);
+        var body=fill(pick(P.body),c,extra);
+        var open=pick(c.TONE.open);
+        var cta=pick(c.TONE.cta);
+        var caption=hook+"\n\n"+body+"\n\n"+(pk==="cta"?"":open+" ")+cta;
+        var tags=P.tags.map(function(tg){ return fill(tg,c,extra); }).join(" ");
+        out.push({
+          week:wi+1, day:DAYS[di], pillar:P.name, tag:P.tag, reel:!!P.reel, real:!!P.real,
+          hook:hook, caption:caption, tags:tags
+        });
+      });
+    });
+    return {c:c, posts:out};
+  }
+
+  function buildReels(month){
+    var c=month.c;
+    var picks=month.posts.filter(function(p){ return p.reel; }).slice(0,3);
+    return picks.map(function(p,i){
+      var isTips = p.tag==="education";
+      var shots = isTips ? [
+        {v:"Open on a clean 3D render of a "+c.T.unit+", slow push-in.", o:capFirst(p.hook.replace(/\.$/,""))},
+        {v:"Cut to a detail — an edge, a joint, a reveal — held for a beat.", o:"The part that matters"},
+        {v:"Pull back to the finished "+c.T.unit+" in a neutral space.", o:"Plan it right the first time"}
+      ] : [
+        {v:"Overhead of a drawing sheet, camera drifts across it.", o:"It starts on paper"},
+        {v:"Time-lapse feel: parts coming together into a "+c.T.unit+".", o:c.T.steps[3]+" → "+c.T.steps[4]},
+        {v:"The unit installed, clean, camera slow-pans across the front.", o:"Built to spec, installed clean"}
+      ];
+      return {
+        title:p.pillar+" reel", when:"Week "+p.week+" · "+p.day,
+        concept: isTips
+          ? "A 15-second explainer on “"+p.hook.replace(/\.$/,"")+"”. Concept visuals only — never styled to look like a real client’s project."
+          : "A 15-second look at how "+c.co+" takes a "+c.T.unit+" from drawing to install. Concept animation, not real project footage.",
+        shots:shots,
+        caption:p.caption,
+        disc:"On-post label: “AI-generated concept.” Closes on the same CTA as the written posts."
+      };
+    });
+  }
+
+  /* ---------- render ---------- */
+  var MONTH=null, TABS="cal";
+  function render(){
+    if(!MONTH) return;
+    $("#output").style.display="block";
+    $$(".tabs button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab===TABS); });
+    var pane=$("#pane");
+    if(TABS==="cal") pane.innerHTML=renderCal();
+    else if(TABS==="posts") pane.innerHTML=renderPosts();
+    else pane.innerHTML=renderReels();
+    bindCopy();
+    var c=MONTH.c;
+    $("#note").textContent="12 posts across 4 weeks, 3 per week. Pillar mix is fixed so the trust posts (spotlight, proof, feature) outweigh the promotional ones. The two education and two behind-the-build slots double as reel scripts. Everything is filled from "+c.co+" / "+c.city+" / “"+c.sig+"” — change any field and regenerate.";
+    $("#footStamp").textContent="generated "+new Date().toLocaleTimeString();
+  }
+  function renderCal(){
+    var byWeek=[[],[],[],[]];
+    MONTH.posts.forEach(function(p){ byWeek[p.week-1].push(p); });
+    return '<div class="weeks">'+byWeek.map(function(wk,i){
+      return '<div class="week"><header>Week '+(i+1)+'</header><div class="days">'+
+        wk.map(function(p){
+          return '<div class="day"><span class="dn">'+p.day+'</span><br>'+
+            '<span class="pill'+(p.reel?' reel':'')+'">'+(p.reel?'REEL · ':'')+p.pillar+'</span>'+
+            '<div class="hook">'+esc(p.hook)+'</div></div>';
+        }).join("")+
+      '</div></div>';
+    }).join("")+'</div>';
+  }
+  function renderPosts(){
+    return MONTH.posts.map(function(p,idx){
+      return '<div class="post"><header>'+
+        '<span class="badge">'+p.pillar+'</span>'+
+        '<span class="when">Week '+p.week+' · '+p.day+'</span>'+
+        '<span class="sp"></span>'+
+        '<button class="copybtn" data-copy="'+idx+'">Copy</button></header>'+
+        '<div class="body" id="cap'+idx+'">'+esc(p.caption)+'</div>'+
+        '<div class="tags">'+esc(p.tags)+'</div></div>';
+    }).join("");
+  }
+  function renderReels(){
+    var reels=buildReels(MONTH);
+    return reels.map(function(r,idx){
+      return '<div class="reel-c"><header><span class="badge">REEL</span><h3>'+esc(r.title)+'</h3><span class="when muted mono" style="margin-left:auto;font-size:0.7rem">'+esc(r.when)+'</span></header>'+
+        '<div class="pad"><p style="margin:0 0 0.3rem">'+esc(r.concept)+'</p>'+
+        '<div class="shots">'+r.shots.map(function(s,i){
+          return '<div class="shot"><span class="sn">'+(i+1)+'</span><span>'+esc(s.v)+'<span class="ost">on-screen: “'+esc(s.o)+'”</span></span></div>';
+        }).join("")+'</div>'+
+        '<div class="cap"><b>Caption</b>\n'+esc(r.caption)+'</div>'+
+        '<div class="disc">'+esc(r.disc)+'</div></div></div>';
+    }).join("");
+  }
+  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+
+  function bindCopy(){
+    $$("[data-copy]").forEach(function(b){
+      b.addEventListener("click",function(){
+        var i=b.dataset.copy;
+        var p=MONTH.posts[i];
+        var txt=p.caption+"\n\n"+p.tags;
+        if(navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ b.textContent="Copied ✓"; setTimeout(function(){b.textContent="Copy";},1200); });
+      });
+    });
+  }
+
+  $$(".tabs button").forEach(function(b){ b.addEventListener("click",function(){ TABS=b.dataset.tab; render(); }); });
+
+  $("#genBtn").addEventListener("click",function(){
+    seed=(Date.now()>>>0);
+    MONTH=buildMonth();
+    TABS="cal"; render();
+    $("#shuffleBtn").disabled=false; $("#copyAllBtn").disabled=false;
+  });
+  $("#shuffleBtn").addEventListener("click",function(){
+    seed=(seed*2654435761)>>>0;
+    MONTH=buildMonth(); render();
+    toast("Wording reshuffled");
+  });
+  $("#copyAllBtn").addEventListener("click",function(){
+    if(!MONTH) return;
+    var txt=MONTH.posts.map(function(p){
+      return "["+"Week "+p.week+" "+p.day+" — "+p.pillar+"]\n"+p.caption+"\n"+p.tags;
+    }).join("\n\n———\n\n");
+    if(navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ toast("All 12 captions copied"); });
+  });
+})();
+</script>
+</body>
+</html>
