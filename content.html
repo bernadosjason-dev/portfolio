@@ -123,7 +123,7 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <span class="brandmark"><span class="dot"></span>Cadence<span class="sub">Content Engine</span></span>
+    <span class="brandmark"><span class="dot"></span>Content Engine<span class="sub">construction marketing</span></span>
     <span class="tb-spacer"></span>
     <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
   </div>
@@ -137,16 +137,16 @@
     <div class="setup">
       <div class="sf"><label for="trade">Business type</label>
         <select id="trade">
-          <option value="millwork">Architectural millwork shop</option>
-          <option value="kb">Kitchen &amp; bath dealer</option>
-          <option value="remodel">Design-build remodeler</option>
-          <option value="closet">Closet &amp; storage company</option>
-          <option value="gc">Commercial general contractor</option>
+          <option value="gc">General contractor</option>
+          <option value="remodel">Remodeler</option>
+          <option value="concrete">Concrete &amp; sitework contractor</option>
+          <option value="mep">Mechanical &amp; electrical contractor</option>
+          <option value="specialty">Specialty subcontractor</option>
         </select>
       </div>
-      <div class="sf"><label for="co">Company name</label><input id="co" value="Meridian Millwork" /></div>
-      <div class="sf"><label for="city">City / region</label><input id="city" value="Austin, TX" /></div>
-      <div class="sf"><label for="signature">Signature offering</label><input id="signature" value="custom commercial casework" /></div>
+      <div class="sf"><label for="co">Company name</label><input id="co" value="Copperline Builders" /></div>
+      <div class="sf"><label for="city">City / region</label><input id="city" value="Denver, CO" /></div>
+      <div class="sf"><label for="signature">Signature offering</label><input id="signature" value="ground-up commercial construction" /></div>
       <div class="sf"><label for="tone">Voice</label>
         <select id="tone">
           <option value="pro">Confident &amp; professional</option>
@@ -172,7 +172,7 @@
     </div>
   </main>
   <footer class="appfoot">
-    <span>Cadence · content engine demo · template-generated</span>
+    <span>Content Engine · demo · template-generated</span>
     <span id="footStamp"></span>
   </footer>
 </div>
@@ -202,26 +202,26 @@
 
   /* ---------- trade vocab ---------- */
   var TRADE={
-    millwork:{noun:"millwork",work:"casework and architectural millwork",unit:"cabinet run",team:"the shop",
-      steps:["field measure","shop drawings","submittals","fabrication","finishing","delivery","install","punch"],
-      proof:"a GC who has us back on the next three projects",
-      tips:["how to read a millwork submittal without missing a revision","why a field-verified dimension beats a plan dimension every time","the three things that delay a casework package more than anything else","laminate vs. veneer: where each one actually belongs","what “AWI Premium Grade” changes on your invoice"]},
-    kb:{noun:"kitchen & bath",work:"kitchen and bath cabinetry",unit:"kitchen",team:"our design team",
-      steps:["consultation","measure","design","selections","order","delivery","install","reveal"],
-      proof:"a homeowner who sent us their neighbor",
-      tips:["the one kitchen measurement people always get wrong","framed vs. frameless cabinets, in plain terms","how long a cabinet order really takes, start to finish","where to spend and where to save on a kitchen","why the layout matters more than the door style"]},
-    remodel:{noun:"remodeling",work:"design-build kitchen and bath remodels",unit:"remodel",team:"our crew",
-      steps:["consult","design","estimate","permits","demo","build","finish","walkthrough"],
-      proof:"a repeat client on their second project with us",
-      tips:["what a realistic remodel timeline looks like","the questions to ask before you sign with any remodeler","why the demo phase always finds something","how a fixed-price contract actually protects you","the difference an in-house crew makes on a job"]},
-    closet:{noun:"custom storage",work:"custom closets and storage systems",unit:"closet",team:"our installers",
-      steps:["consultation","measure","design","build","delivery","install","styling","reveal"],
-      proof:"a client who had us do every closet in the house",
-      tips:["start with what you own, not the closet size","adjustable shelving is worth it — here’s why","the reach-in closet mistake almost everyone makes","how to plan a closet around hanging length","why a closet design starts with a measurement, not a catalog"]},
     gc:{noun:"construction",work:"commercial construction",unit:"project",team:"our field team",
       steps:["preconstruction","buyout","mobilization","structure","MEP","finishes","commissioning","closeout"],
       proof:"an owner who negotiated the next project with us directly",
-      tips:["what preconstruction actually buys you","how a clean submittal log keeps a schedule honest","the RFI that should have been a phone call","why the punch list starts long before substantial completion","reading a schedule: float, critical path, and what to watch"]}
+      tips:["what preconstruction actually buys you","how a clean submittal log keeps a schedule honest","the RFI that should have been a phone call","why the punch list starts long before substantial completion","reading a schedule: float, critical path, and what to watch"]},
+    remodel:{noun:"remodeling",work:"commercial and residential remodels",unit:"project",team:"our crew",
+      steps:["consult","design","estimate","permits","demo","build","finish","walkthrough"],
+      proof:"a repeat client on their second project with us",
+      tips:["what a realistic remodel timeline looks like","the questions to ask before you sign with any builder","why the demo phase always finds something","how a fixed-price contract actually protects you","the difference an in-house crew makes on a job"]},
+    concrete:{noun:"concrete & sitework",work:"site concrete, foundations and flatwork",unit:"pour",team:"our field crew",
+      steps:["layout","excavation","forming","rebar","pour","finish","strip","backfill"],
+      proof:"a GC who puts us on every project they bid",
+      tips:["why a pre-pour checklist saves a Saturday","what actually causes slab cracking, and what does not","the case for a laser screed on anything over 5,000 SF","cold-weather concreting without the callbacks","reading a soils report before you bid the dirt"]},
+    mep:{noun:"mechanical & electrical",work:"commercial MEP installation",unit:"building",team:"our field team",
+      steps:["coordination","submittals","rough-in","trim","startup","balancing","testing","closeout"],
+      proof:"a GC who hands us the drawings and stops worrying about the ceiling",
+      tips:["why MEP coordination in a model pays for itself","the rough-in inspection failures we do not get anymore","how to phase a retrofit in an occupied building","commissioning: what the owner actually gets","the long-lead items that will wreck your schedule"]},
+    specialty:{noun:"specialty trade work",work:"specialty subcontract scopes",unit:"scope",team:"our field team",
+      steps:["takeoff","submittals","fabrication","delivery","install","punch","closeout","warranty"],
+      proof:"a GC who negotiates our scope instead of bidding it",
+      tips:["how a clean submittal keeps your scope off the critical path","the coordination meeting that prevents the RFI","why your best crew should start the job, not finish it","what a good closeout package is worth at retention time","reading the spec section that actually governs your work"]}
   };
   var TONE={
     pro:{open:["Here’s how we think about it.","A note from the shop floor.","Worth saying plainly."],

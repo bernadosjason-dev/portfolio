@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operations Tracker</title>
+<meta name="description" content="One screen for the state of a construction business — jobs, crews, equipment, deliveries and compliance, with everything that needs attention pulled to the top. Works for any trade. Sample data included." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root{
+    --paper:#F3F4F1; --surface:#FFFFFF; --surface-2:#ECEEE9; --hover:#E7E9E3;
+    --ink:#1B1E1B; --ink-2:#45493F; --ink-3:#6A6E63;
+    --line:#D3D5CC; --line-2:#E1E2DB;
+    --brand:#C43D2B; --brand-ink:#FFFFFF;
+    --ok:#2F7D4F; --ok-bg:#E4F0E7; --warn:#A9701A; --warn-bg:#F6ECD9;
+    --bad:#C0392B; --bad-bg:#F5E1DE; --idle:#6A6E63; --idle-bg:#E7E8E2;
+    --focus:#C43D2B;
+    --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --s-1:0.78rem; --s0:0.94rem; --s1:1.1rem; --s2:1.35rem; --s3:1.7rem; --s4:2.2rem;
+    --radius:3px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+      --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+      --brand:#E4573F; --brand-ink:#17140F;
+      --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+      --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+    --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+    --brand:#E4573F; --brand-ink:#17140F;
+    --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+    --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:var(--font-body);font-size:var(--s0);line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;margin:0}
+  button{font:inherit;cursor:pointer} a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  input,select,textarea{font:inherit;color:inherit}
+  .mono{font-family:var(--font-mono)} .muted{color:var(--ink-3)}
+  .app{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+  .topbar{display:flex;align-items:center;gap:1rem;padding:0 clamp(1rem,3vw,2rem);height:60px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brandmark{display:flex;align-items:baseline;gap:0.55rem;font-family:var(--font-display);font-weight:800;font-size:var(--s2);letter-spacing:-0.02em}
+  .brandmark .dot{width:9px;height:9px;background:var(--brand);display:inline-block;transform:translateY(-1px)}
+  .brandmark .sub{font-family:var(--font-mono);font-weight:400;font-size:var(--s-1);color:var(--ink-3)}
+  .tb-spacer{margin-left:auto}
+  .company{display:flex;align-items:center;gap:0.6rem;font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-2)}
+  .company::before{content:"";width:6px;height:6px;background:var(--ok);border-radius:50%}
+  .iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:var(--radius)}
+  .iconbtn:hover{background:var(--hover);color:var(--ink)}
+  main{padding:clamp(1.1rem,3vw,2rem);min-width:0}
+  .page-head{display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem}
+  .page-head .eyebrow{font-family:var(--font-mono);font-size:var(--s-1);color:var(--brand);letter-spacing:0.06em;text-transform:uppercase}
+  .page-head h1{font-size:var(--s4);line-height:1.05}
+  .page-head .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.95rem;font-family:var(--font-mono);font-size:var(--s-1);letter-spacing:0.02em;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:var(--radius);transition:background .15s,color .15s}
+  .btn:hover{background:var(--hover)}
+  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.primary:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.sm{padding:0.3rem 0.55rem}
+  .btn.ghost{border-color:var(--line)}
+  .tabs{display:flex;gap:0.2rem;border-bottom:1px solid var(--line);margin-bottom:1.3rem;overflow-x:auto}
+  .tabs button{padding:0.6rem 0.9rem;background:transparent;border:0;font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);border-bottom:2px solid transparent;white-space:nowrap}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:1.4rem}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:0.85rem 1rem}
+  .kpi .label{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em}
+  .kpi .value{font-family:var(--font-display);font-weight:800;font-size:var(--s3);line-height:1.1;margin-top:0.25rem;font-variant-numeric:tabular-nums}
+  .kpi .value.alert{color:var(--bad)}
+  .kpi .foot{font-size:0.7rem;color:var(--ink-3);margin-top:0.1rem}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:1.1rem}
+  .panel>header{padding:0.75rem 1rem;border-bottom:1px solid var(--line);display:flex;gap:0.7rem;align-items:center}
+  .panel>header h3{font-size:var(--s1)}
+  .panel>header .count{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3)}
+  .panel>header .sp{flex:1}
+  .cols-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+  @media (max-width:920px){.cols-2{grid-template-columns:1fr}}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.86rem}
+  th,td{text-align:left;padding:0.55rem 0.8rem;border-bottom:1px solid var(--line-2);white-space:nowrap;vertical-align:top}
+  th{font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-3);border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:var(--hover)}
+  td.num{font-variant-numeric:tabular-nums}
+  td .rowact{display:flex;gap:0.3rem;opacity:0;transition:opacity .12s}
+  tr:hover .rowact{opacity:1}
+  .chip{display:inline-flex;align-items:center;gap:0.32rem;padding:0.1rem 0.5rem;font-family:var(--font-mono);font-size:0.66rem;border-radius:100px;white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .chip.ok{color:var(--ok);background:var(--ok-bg)} .chip.warn{color:var(--warn);background:var(--warn-bg)}
+  .chip.bad{color:var(--bad);background:var(--bad-bg)} .chip.idle{color:var(--idle);background:var(--idle-bg)}
+  .bar{height:7px;background:var(--surface-2);border-radius:100px;overflow:hidden;min-width:90px}
+  .bar>span{display:block;height:100%;background:var(--brand)}
+  .bar.ok>span{background:var(--ok)}
+  .with-bar{display:grid;gap:0.25rem}
+  .with-bar .n{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .empty{text-align:center;color:var(--ink-3);padding:2rem 1rem;font-family:var(--font-mono);font-size:var(--s-1)}
+  /* week board */
+  .wk{display:grid;gap:0.5rem}
+  .wk .row{display:grid;grid-template-columns:130px 1fr;gap:0.7rem;align-items:center;font-size:0.84rem}
+  .wk .row .crew{font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-2)}
+  .wk .row .slot{padding:0.4rem 0.6rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2)}
+  .wk .row .slot.none{color:var(--ink-3);font-family:var(--font-mono);font-size:0.72rem}
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(20,22,20,0.55);display:grid;place-items:center;padding:1rem;z-index:60}
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);width:min(560px,100%);max-height:90vh;overflow-y:auto}
+  .modal header{padding:1rem 1.2rem;border-bottom:1px solid var(--line);display:flex;align-items:center}
+  .modal header h3{font-size:var(--s1)}
+  .modal header button{margin-left:auto;background:transparent;border:0;font-size:1.3rem;color:var(--ink-3);line-height:1}
+  .modal form{padding:1.2rem;display:grid;gap:0.9rem}
+  .field{display:grid;gap:0.3rem}
+  .field label{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-2)}
+  .field input,.field select,.field textarea{padding:0.5rem 0.6rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);width:100%}
+  .field textarea{min-height:56px;resize:vertical}
+  .field.row2{grid-template-columns:1fr 1fr;gap:0.9rem}
+  @media (max-width:520px){.field.row2{grid-template-columns:1fr}}
+  .modal .actions{display:flex;gap:0.6rem;justify-content:space-between;padding-top:0.3rem}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:0.6rem 1rem;font-family:var(--font-mono);font-size:var(--s-1);border-radius:var(--radius);opacity:0;transition:opacity .2s,transform .2s;z-index:80;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer.appfoot{padding:1.4rem clamp(1rem,3vw,2rem);border-top:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);display:flex;gap:1rem 1.5rem;flex-wrap:wrap;justify-content:space-between}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="brandmark"><span class="dot"></span>Operations Tracker<span class="sub">construction</span></span>
+    <span class="tb-spacer"></span>
+    <span class="company" id="companyName">Company</span>
+    <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+    <button class="iconbtn" id="dataBtn" title="Data &amp; backup" aria-label="Data and backup">⋯</button>
+  </div>
+  <main id="app"></main>
+  <footer class="appfoot">
+    <span>Operations Tracker &middot; any trade &middot; data stored in this browser</span>
+    <span id="footStamp"></span>
+  </footer>
+</div>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  var uid=function(){return Math.random().toString(36).slice(2,9);};
+  function todayISO(){return new Date().toISOString().slice(0,10);}
+  function dISO(off){var d=new Date();d.setDate(d.getDate()+off);return d.toISOString().slice(0,10);}
+  function parseD(s){return s?new Date(s+"T00:00:00"):null;}
+  function daysFromNow(s){if(!s)return null;return Math.round((parseD(s)-parseD(todayISO()))/86400000);}
+  function fmtDate(s){if(!s)return "—";return parseD(s).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
+  function fmtUSD(n){n=Number(n)||0;return "$"+n.toLocaleString("en-US");}
+  function fmtK(n){n=Number(n)||0;if(n>=1e6)return "$"+(n/1e6).toFixed(1)+"M";if(n>=1e3)return "$"+Math.round(n/1e3)+"K";return "$"+n;}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("show");},2000);}
+
+  /* ---------- status maps ---------- */
+  var JOB_STATUS={active:{label:"Active",cls:"ok"},"on-hold":{label:"On hold",cls:"warn"},complete:{label:"Complete",cls:"idle"}};
+  var EQ_STATUS={"in-use":{label:"In use",cls:"ok"},idle:{label:"Idle",cls:"idle"},maintenance:{label:"Maintenance",cls:"warn"},down:{label:"Down",cls:"bad"}};
+  var DEL_STATUS={scheduled:{label:"Scheduled",cls:"idle"},"in-transit":{label:"In transit",cls:"warn"},received:{label:"Received",cls:"ok"},late:{label:"Late",cls:"bad"}};
+  var CMP_CAT=["License","Insurance","Certification","Training"];
+  var EQ_TYPES=["Earthmoving","Aerial lift","Compaction","Power / generator","Layout / survey","Material handling","Small tools","Vehicle"];
+  var TRADES=["Concrete / foundations","Framing / structure","Sitework / civil","MEP","Finishes","Punch / warranty","General labor"];
+  function chip(map,k){var m=map[k]||{label:k||"—",cls:"idle"};return '<span class="chip '+m.cls+'">'+esc(m.label)+'</span>';}
+
+  /* ---------- seed ---------- */
+  function seed(){
+    var J=[
+      j("j1","Mesa Verde Elementary — Addition & Renovation","Cartwright School District","Phoenix, AZ","Superstructure","Engr. L. Ferrante",54,"active","Roof dry-in",18,"Rebar delivery is 3 days late — slab pour on hold"),
+      j("j2","Ironwood Logistics Center — Phase 2","Ironwood Industrial Partners","Goodyear, AZ","Envelope",  "Engr. L. Ferrante",71,"active","Panels set complete",12,""),
+      j("j3","Camelback Medical Office — TI Fit-out","Sonora Health","Phoenix, AZ","Finishes","P. Okonkwo",63,"active","Owner walk",22,""),
+      j("j4","Rio Salado Apartments — 84 units","Salado Residential","Tempe, AZ","Framing","P. Okonkwo",38,"active","Building 2 topped out",30,""),
+      j("j5","City of Tempe — Curb & ADA Ramp Program","City of Tempe","Tempe, AZ","Sitework","M. Salcido",82,"active","Final ADA inspection",9,"")
+    ];
+    function j(id,name,client,loc,phase,pm,progress,status,nextMs,msIn,blocker){
+      return {id:id,name:name,client:client,location:loc,phase:phase,pm:pm,progress:progress,status:status,nextMilestone:nextMs,milestoneDate:dISO(msIn),blocker:blocker||""};
+    }
+    var C=[
+      c("Crew A","M. Salcido",8,"Concrete / foundations","j1",-6,20),
+      c("Crew B","D. Ortega",10,"Framing / structure","j4",-14,35),
+      c("Crew C","R. Nunez",6,"Finishes","j3",-3,26),
+      c("Crew D","T. Whitehorse",7,"Sitework / civil","j5",-20,9),
+      c("Crew E","J. Kim",3,"Punch / warranty","j2",-2,14),
+      c("Crew F","(hiring lead)",4,"General labor","",0,0)
+    ];
+    function c(name,lead,size,trade,job,from,to){
+      return {id:uid(),name:name,lead:lead,size:size,trade:trade,assignedJob:job,assignedFrom:job?dISO(from):"",assignedTo:job?dISO(to):""};
+    }
+    var E=[
+      e("Excavator, 20-ton","Earthmoving","EX-01","yard","maintenance",4,false,"Owned"),
+      e("Skid steer","Earthmoving","SS-04","j5","in-use",120,false,"Owned"),
+      e("Scissor lift, 26 ft","Aerial lift","RENT-SL2","j3","in-use",null,true,"Sunbelt — monthly"),
+      e("Boom lift, 45 ft","Aerial lift","RENT-BL1","j2","in-use",null,true,"United — monthly"),
+      e("Plate compactor","Compaction","CP-02","yard","down",-1,false,"Owned — awaiting part"),
+      e("Generator, 25 kW","Power / generator","GEN-03","j4","in-use",45,false,"Owned"),
+      e("Rotary laser + tripod","Layout / survey","LAS-01","yard","idle",90,false,"Owned"),
+      e("Concrete buggy","Material handling","BUG-01","yard","idle",60,false,"Owned")
+    ];
+    function e(name,type,tag,loc,status,svcIn,rented,owner){
+      return {id:uid(),name:name,type:type,tag:tag,location:loc,status:status,nextService:svcIn==null?"":dISO(svcIn),rented:rented,owner:owner};
+    }
+    var D=[
+      d("Reinforcing steel, #5 — 4 tons","CMC Rebar","j1",-3,"late","4 tons"),
+      d("Roof panels — 24-ga standing seam","ABC Supply","j2",5,"scheduled","1 truck"),
+      d("VCT flooring & wall base","Shaw Contract","j3",2,"in-transit","2,400 SF"),
+      d("Wood roof trusses — Bldg 2","BMC","j4",9,"scheduled","1 set"),
+      d("Truncated dome panels","ADA Solutions","j5",-5,"received","36 ea"),
+      d("Door hardware — finish package","Allegion","j3",12,"scheduled","1 pallet")
+    ];
+    function d(item,supplier,job,expIn,status,qty){
+      return {id:uid(),item:item,supplier:supplier,jobId:job,expected:dISO(expIn),status:status,qty:qty};
+    }
+    var M=[
+      m("General liability insurance","Insurance","Company",22),
+      m("Workers' compensation","Insurance","Company",138),
+      m("State contractor license — B-01","License","Company",64),
+      m("OSHA 30-hour","Training","Crew B — D. Ortega",8),
+      m("First aid / CPR","Training","Crew A",-4),
+      m("Fall protection training","Training","Crew D",46),
+      m("DBE certification","Certification","Company",205)
+    ];
+    function m(item,cat,holder,expIn){
+      return {id:uid(),item:item,category:cat,holder:holder,expires:dISO(expIn)};
+    }
+    return {company:"Rincon Construction Group",jobs:J,crews:C,equipment:E,deliveries:D,compliance:M,savedAt:new Date().toISOString()};
+  }
+
+  /* ---------- store ---------- */
+  var KEY="opstracker.v1";
+  var state=load();
+  function load(){try{var r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}var s=seed();persist(s);return s;}
+  function persist(s){s=s||state;s.savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}var f=$("#footStamp");if(f)f.textContent="saved "+new Date(s.savedAt).toLocaleString("en-US");}
+  function save(){persist(state);}
+  function coll(n){return state[n]||(state[n]=[]);}
+  function byId(n,id){return coll(n).filter(function(r){return r.id===id;})[0];}
+  function jobName(id){var j=byId("jobs",id);return j?j.name:(id==="yard"?"Yard / shop":"—");}
+  function jobShort(id){var n=jobName(id);return n.split(" — ")[0];}
+  function upsert(n,rec){var a=coll(n),i=-1;for(var k=0;k<a.length;k++){if(a[k].id===rec.id){i=k;break;}}if(i>=0)a[i]=rec;else a.push(rec);save();}
+  function remove(n,id){state[n]=coll(n).filter(function(r){return r.id!==id;});save();}
+
+  /* ---------- computed / attention ---------- */
+  function attention(){
+    var out=[], t=todayISO();
+    coll("jobs").forEach(function(j){ if(j.blocker) out.push({sort:0,kind:"Job blocked",cls:"bad",who:jobShort(j.id),what:j.blocker,tab:"jobs"}); });
+    coll("equipment").forEach(function(e){
+      if(e.status==="down") out.push({sort:0,kind:"Equipment down",cls:"bad",who:e.name,what:"at "+jobShort(e.location)+" — "+(e.owner||""),tab:"equipment"});
+      var d=daysFromNow(e.nextService);
+      if(e.nextService && d!=null && d<=7) out.push({sort:d,kind:d<0?"Service overdue":"Service due",cls:d<0?"bad":"warn",who:e.name,what:(d<0?Math.abs(d)+" d ago":"in "+d+" d"),tab:"equipment"});
+    });
+    coll("deliveries").forEach(function(x){
+      if(x.status==="late") out.push({sort:daysFromNow(x.expected)||0,kind:"Delivery late",cls:"bad",who:jobShort(x.jobId),what:x.item+" — "+x.supplier,tab:"deliveries"});
+      else {
+        var d=daysFromNow(x.expected);
+        if(x.status!=="received" && d!=null && d<=3 && d>=0) out.push({sort:d,kind:"Delivery due",cls:"warn",who:jobShort(x.jobId),what:x.item+" — "+(d===0?"today":"in "+d+" d"),tab:"deliveries"});
+      }
+    });
+    coll("compliance").forEach(function(m){
+      var d=daysFromNow(m.expires);
+      if(d==null)return;
+      if(d<0) out.push({sort:d,kind:"Expired",cls:"bad",who:m.holder,what:m.item+" — "+Math.abs(d)+" d ago",tab:"compliance"});
+      else if(d<=30) out.push({sort:d,kind:"Expiring",cls:"warn",who:m.holder,what:m.item+" — in "+d+" d",tab:"compliance"});
+    });
+    coll("crews").forEach(function(c){ if(!c.assignedJob) out.push({sort:1,kind:"Crew unassigned",cls:"warn",who:c.name,what:c.trade+" — "+c.size+" people",tab:"crews"}); });
+    out.sort(function(a,b){ if(a.cls!==b.cls) return a.cls==="bad"?-1:1; return a.sort-b.sort; });
+    return out;
+  }
+  function cmpState(m){var d=daysFromNow(m.expires);if(d==null)return{label:"—",cls:"idle"};if(d<0)return{label:"Expired",cls:"bad"};if(d<=30)return{label:"Expiring",cls:"warn"};return{label:"Valid",cls:"ok"};}
+
+  /* ---------- render ---------- */
+  var ui={tab:"overview"};
+  function render(){
+    $("#companyName").textContent=state.company||"Company";
+    var el=$("#app");
+    var jobs=coll("jobs"), crews=coll("crews"), eq=coll("equipment"), del=coll("deliveries"), cmp=coll("compliance");
+    var active=jobs.filter(function(j){return j.status==="active";});
+    var deployed=crews.filter(function(c){return c.assignedJob;}).length;
+    var inUse=eq.filter(function(e){return e.status==="in-use";}).length;
+    var dueWk=del.filter(function(x){var d=daysFromNow(x.expected);return x.status!=="received"&&(x.status==="late"||(d!=null&&d>=0&&d<=7));}).length;
+    var cmpAlert=cmp.filter(function(m){var d=daysFromNow(m.expires);return d!=null&&d<=30;}).length;
+    var blockers=jobs.filter(function(j){return j.blocker;}).length;
+
+    var head='<div class="page-head"><div><div class="eyebrow">Operations · live demo</div><h1>Operations Tracker</h1></div><div class="sp"></div>'+addMenu()+'</div>';
+    var kpis='<div class="kpis">'+
+      kpi("Active jobs",active.length,jobs.length+" on the board")+
+      kpi("Crews deployed",deployed+" / "+crews.length,(crews.length-deployed)+" unassigned",crews.length-deployed>0)+
+      kpi("Equipment in use",inUse+" / "+eq.length,Math.round(inUse/Math.max(1,eq.length)*100)+"% utilization")+
+      kpi("Deliveries this week",dueWk,"due or late")+
+      kpi("Compliance",cmpAlert,cmpAlert?"expiring ≤ 30 days":"all current",cmpAlert>0)+
+      kpi("Open blockers",blockers,blockers?"holding work":"none",blockers>0)+
+    '</div>';
+    var tabs='<div class="tabs" role="tablist">'+
+      ["overview","jobs","crews","equipment","deliveries","compliance"].map(function(t){
+        return '<button role="tab" aria-selected="'+(ui.tab===t)+'" onclick="setTab(\''+t+'\')">'+t.charAt(0).toUpperCase()+t.slice(1)+'</button>';
+      }).join("")+'</div>';
+    var body = ui.tab==="jobs"?viewJobs():ui.tab==="crews"?viewCrews():ui.tab==="equipment"?viewEquip()
+             : ui.tab==="deliveries"?viewDeliv():ui.tab==="compliance"?viewCompliance():viewOverview();
+    el.innerHTML=head+kpis+tabs+body;
+    function kpi(l,v,f,a){return '<div class="kpi"><div class="label">'+esc(l)+'</div><div class="value'+(a?' alert':'')+'">'+esc(String(v))+'</div><div class="foot">'+esc(f)+'</div></div>';}
+  }
+  window.setTab=function(t){ui.tab=t;render();};
+  function addMenu(){
+    return '<div style="position:relative"><button class="btn primary" onclick="toggleAdd(event)">+ New ▾</button>'+
+      '<div id="addMenu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);z-index:30;min-width:150px">'+
+      [["jobs","Job"],["crews","Crew"],["equipment","Equipment"],["deliveries","Delivery"],["compliance","Compliance item"]].map(function(x){
+        return '<button class="btn ghost" style="display:block;width:100%;border:0;border-radius:0;text-align:left" onclick="openForm(\''+x[0]+'\')">'+x[1]+'</button>';
+      }).join("")+'</div></div>';
+  }
+  window.toggleAdd=function(ev){ev.stopPropagation();var m=$("#addMenu");m.style.display=m.style.display==="none"?"block":"none";
+    document.addEventListener("click",function h(){m.style.display="none";document.removeEventListener("click",h);});};
+
+  function viewOverview(){
+    var feed=attention();
+    var jobRows=coll("jobs").map(function(j){
+      var d=daysFromNow(j.milestoneDate);
+      return '<tr onclick="openForm(\'jobs\',\''+j.id+'\')" style="cursor:pointer">'+
+        '<td><strong>'+esc(jobShort(j.id))+'</strong><br><span class="mono muted" style="font-size:var(--s-1)">'+esc(j.client)+' · '+esc(j.phase)+'</span></td>'+
+        '<td>'+chip(JOB_STATUS,j.status)+(j.blocker?' <span class="chip bad">blocked</span>':'')+'</td>'+
+        '<td><div class="with-bar"><div class="bar'+(j.progress>=100?' ok':'')+'"><span style="width:'+(Number(j.progress)||0)+'%"></span></div><span class="n">'+(Number(j.progress)||0)+'%</span></div></td>'+
+        '<td class="mono" style="font-size:var(--s-1)">'+esc(j.nextMilestone||"—")+'<br><span class="muted">'+(d==null?"":(d<0?Math.abs(d)+" d ago":"in "+d+" d"))+'</span></td>'+
+      '</tr>';
+    }).join("");
+    return '<div class="cols-2">'+
+      '<div class="panel"><header><h3>Needs attention</h3><span class="count">'+feed.length+'</span></header>'+
+        (feed.length?'<div class="tablewrap"><table><tbody>'+feed.map(function(f){
+          return '<tr onclick="setTab(\''+f.tab+'\')" style="cursor:pointer"><td><span class="chip '+f.cls+'">'+esc(f.kind)+'</span></td><td>'+esc(f.who)+'</td><td class="muted">'+esc(f.what)+'</td></tr>';
+        }).join("")+'</tbody></table></div>':'<div class="empty">Nothing flagged. The board is clean.</div>')+
+      '</div>'+
+      '<div class="panel"><header><h3>Crews this week</h3><span class="count">'+coll("crews").length+'</span></header><div class="pad"><div class="wk">'+
+        coll("crews").map(function(c){
+          return '<div class="row"><span class="crew">'+esc(c.name)+'</span>'+
+            (c.assignedJob?'<span class="slot">'+esc(jobShort(c.assignedJob))+' <span class="muted mono" style="font-size:0.68rem">'+esc(c.trade)+'</span></span>'
+                          :'<span class="slot none">unassigned</span>')+'</div>';
+        }).join("")+
+      '</div></div></div>'+
+    '</div>'+
+    '<div class="panel"><header><h3>Jobs</h3><span class="count">'+coll("jobs").length+'</span><span class="sp"></span><button class="btn sm ghost" onclick="setTab(\'jobs\')">Open</button></header>'+
+      '<div class="tablewrap"><table><thead><tr><th>Job</th><th>Status</th><th>Progress</th><th>Next milestone</th></tr></thead><tbody>'+jobRows+'</tbody></table></div></div>';
+  }
+
+  function viewJobs(){
+    var rows=coll("jobs").map(function(j){
+      return '<tr>'+
+        '<td><strong>'+esc(j.name)+'</strong><br><span class="mono muted" style="font-size:var(--s-1)">'+esc(j.client)+' · '+esc(j.location)+'</span></td>'+
+        '<td>'+esc(j.phase)+'</td>'+
+        '<td>'+esc(j.pm)+'</td>'+
+        '<td><div class="with-bar"><div class="bar'+(j.progress>=100?' ok':'')+'"><span style="width:'+(Number(j.progress)||0)+'%"></span></div><span class="n">'+(Number(j.progress)||0)+'%</span></div></td>'+
+        '<td>'+chip(JOB_STATUS,j.status)+'</td>'+
+        '<td class="muted" style="max-width:16rem;white-space:normal">'+esc(j.blocker||"—")+'</td>'+
+        '<td><div class="rowact"><button class="btn sm ghost" onclick="openForm(\'jobs\',\''+j.id+'\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'jobs\',\''+j.id+'\')">Del</button></div></td></tr>';
+    }).join("");
+    return panel("Jobs","jobs",'<thead><tr><th>Job</th><th>Phase</th><th>PM</th><th>Progress</th><th>Status</th><th>Blocker</th><th></th></tr></thead><tbody>'+rows+'</tbody>',coll("jobs").length);
+  }
+  function viewCrews(){
+    var rows=coll("crews").map(function(c){
+      var d=daysFromNow(c.assignedTo);
+      return '<tr>'+
+        '<td><strong>'+esc(c.name)+'</strong><br><span class="mono muted" style="font-size:var(--s-1)">'+esc(c.lead)+'</span></td>'+
+        '<td class="num">'+esc(c.size)+'</td>'+
+        '<td>'+esc(c.trade)+'</td>'+
+        '<td>'+(c.assignedJob?esc(jobShort(c.assignedJob)):'<span class="chip warn">unassigned</span>')+'</td>'+
+        '<td class="mono" style="font-size:var(--s-1)">'+(c.assignedJob?(fmtDate(c.assignedFrom)+" → "+fmtDate(c.assignedTo)+(d!=null&&d>=0&&d<=5?' <span class="chip warn">frees in '+d+'d</span>':'')):"—")+'</td>'+
+        '<td><div class="rowact"><button class="btn sm ghost" onclick="openForm(\'crews\',\''+c.id+'\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'crews\',\''+c.id+'\')">Del</button></div></td></tr>';
+    }).join("");
+    return panel("Crews","crews",'<thead><tr><th>Crew</th><th>People</th><th>Trade</th><th>Assigned to</th><th>Window</th><th></th></tr></thead><tbody>'+rows+'</tbody>',coll("crews").length);
+  }
+  function viewEquip(){
+    var rows=coll("equipment").map(function(e){
+      var d=daysFromNow(e.nextService);
+      var late=d!=null&&d<0;
+      return '<tr>'+
+        '<td><strong>'+esc(e.name)+'</strong><br><span class="mono muted" style="font-size:var(--s-1)">'+esc(e.tag)+' · '+esc(e.type)+'</span></td>'+
+        '<td>'+esc(jobShort(e.location))+'</td>'+
+        '<td>'+chip(EQ_STATUS,e.status)+'</td>'+
+        '<td>'+(e.rented?'<span class="chip idle">rented</span>':'<span class="muted mono" style="font-size:var(--s-1)">owned</span>')+'</td>'+
+        '<td class="mono" style="font-size:var(--s-1)">'+(e.nextService?(fmtDate(e.nextService)+(d!=null&&d<=7?' <span class="chip '+(late?'bad':'warn')+'">'+(late?"overdue":"soon")+'</span>':'')):"—")+'</td>'+
+        '<td><div class="rowact"><button class="btn sm ghost" onclick="openForm(\'equipment\',\''+e.id+'\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'equipment\',\''+e.id+'\')">Del</button></div></td></tr>';
+    }).join("");
+    return panel("Equipment","equipment",'<thead><tr><th>Item</th><th>Location</th><th>Status</th><th>Ownership</th><th>Next service</th><th></th></tr></thead><tbody>'+rows+'</tbody>',coll("equipment").length);
+  }
+  function viewDeliv(){
+    var xs=coll("deliveries").slice().sort(function(a,b){return a.expected<b.expected?-1:1;});
+    var rows=xs.map(function(x){
+      var d=daysFromNow(x.expected);
+      return '<tr>'+
+        '<td><strong>'+esc(x.item)+'</strong><br><span class="mono muted" style="font-size:var(--s-1)">'+esc(x.qty||"")+'</span></td>'+
+        '<td>'+esc(x.supplier)+'</td>'+
+        '<td>'+esc(jobShort(x.jobId))+'</td>'+
+        '<td class="mono" style="font-size:var(--s-1)">'+fmtDate(x.expected)+'<br><span class="muted">'+(x.status==="received"?"":(d==null?"":d<0?Math.abs(d)+" d ago":"in "+d+" d"))+'</span></td>'+
+        '<td>'+chip(DEL_STATUS,x.status)+'</td>'+
+        '<td><div class="rowact"><button class="btn sm ghost" onclick="openForm(\'deliveries\',\''+x.id+'\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'deliveries\',\''+x.id+'\')">Del</button></div></td></tr>';
+    }).join("");
+    return panel("Deliveries","deliveries",'<thead><tr><th>Item</th><th>Supplier</th><th>Job</th><th>Expected</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody>',xs.length);
+  }
+  function viewCompliance(){
+    var xs=coll("compliance").slice().sort(function(a,b){return a.expires<b.expires?-1:1;});
+    var rows=xs.map(function(m){
+      var st=cmpState(m), d=daysFromNow(m.expires);
+      return '<tr>'+
+        '<td><strong>'+esc(m.item)+'</strong></td>'+
+        '<td>'+esc(m.category)+'</td>'+
+        '<td>'+esc(m.holder)+'</td>'+
+        '<td class="mono" style="font-size:var(--s-1)">'+fmtDate(m.expires)+'<br><span class="muted">'+(d==null?"":d<0?Math.abs(d)+" d ago":"in "+d+" d")+'</span></td>'+
+        '<td><span class="chip '+st.cls+'">'+st.label+'</span></td>'+
+        '<td><div class="rowact"><button class="btn sm ghost" onclick="openForm(\'compliance\',\''+m.id+'\')">Edit</button><button class="btn sm ghost" onclick="delRec(\'compliance\',\''+m.id+'\')">Del</button></div></td></tr>';
+    }).join("");
+    return panel("Compliance","compliance",'<thead><tr><th>Item</th><th>Type</th><th>Holder</th><th>Expires</th><th>State</th><th></th></tr></thead><tbody>'+rows+'</tbody>',xs.length);
+  }
+  function panel(title,coll_,inner,count){
+    return '<div class="panel"><header><h3>'+esc(title)+'</h3><span class="count">'+count+'</span><span class="sp"></span>'+
+      '<button class="btn primary" onclick="openForm(\''+coll_+'\')">+ Add</button></header>'+
+      (count?'<div class="tablewrap"><table>'+inner+'</table></div>':'<div class="empty">Nothing here yet.</div>')+'</div>';
+  }
+
+  /* ---------- forms ---------- */
+  function jobOpts(sel,extra){
+    var o=coll("jobs").map(function(j){return '<option value="'+j.id+'"'+(j.id===sel?" selected":"")+'>'+esc(jobShort(j.id))+'</option>';}).join("");
+    if(extra) o='<option value=""'+(sel?"":" selected")+'>'+extra+'</option>'+o;
+    return o;
+  }
+  var SCHEMA={
+    jobs:{title:"Job",fields:[
+      {k:"name",label:"Job name",type:"text",req:true},
+      {k:"client",label:"Client / owner",type:"text"},
+      {k:"location",label:"Location",type:"text",row:true},
+      {k:"phase",label:"Current phase",type:"text",row:true},
+      {k:"pm",label:"Project manager",type:"text",row:true},
+      {k:"status",label:"Status",type:"select",opts:JOB_STATUS,row:true},
+      {k:"progress",label:"Progress %",type:"number",row:true},
+      {k:"nextMilestone",label:"Next milestone",type:"text",row:true},
+      {k:"milestoneDate",label:"Milestone date",type:"date"},
+      {k:"blocker",label:"Blocker (leave blank if none)",type:"textarea"}
+    ]},
+    crews:{title:"Crew",fields:[
+      {k:"name",label:"Crew name",type:"text",req:true},
+      {k:"lead",label:"Crew lead",type:"text",row:true},
+      {k:"size",label:"People",type:"number",row:true},
+      {k:"trade",label:"Trade",type:"select",opts:TRADES},
+      {k:"assignedJob",label:"Assigned to",type:"jobselect",row:true},
+      {k:"assignedFrom",label:"From",type:"date",row:true},
+      {k:"assignedTo",label:"Until",type:"date"}
+    ]},
+    equipment:{title:"Equipment",fields:[
+      {k:"name",label:"Item",type:"text",req:true},
+      {k:"tag",label:"Asset tag / ID",type:"text",row:true},
+      {k:"type",label:"Type",type:"select",opts:EQ_TYPES,row:true},
+      {k:"location",label:"Location",type:"jobselect",locYard:true,row:true},
+      {k:"status",label:"Status",type:"select",opts:EQ_STATUS,row:true},
+      {k:"rented",label:"Ownership",type:"boolsel"},
+      {k:"owner",label:"Owner / rental note",type:"text"},
+      {k:"nextService",label:"Next service due",type:"date"}
+    ]},
+    deliveries:{title:"Delivery",fields:[
+      {k:"item",label:"Item",type:"text",req:true},
+      {k:"supplier",label:"Supplier",type:"text",row:true},
+      {k:"qty",label:"Quantity",type:"text",row:true},
+      {k:"jobId",label:"For job",type:"jobselect"},
+      {k:"expected",label:"Expected date",type:"date",row:true},
+      {k:"status",label:"Status",type:"select",opts:DEL_STATUS,row:true}
+    ]},
+    compliance:{title:"Compliance item",fields:[
+      {k:"item",label:"Item",type:"text",req:true},
+      {k:"category",label:"Type",type:"select",opts:CMP_CAT,row:true},
+      {k:"holder",label:"Held by",type:"text",row:true},
+      {k:"expires",label:"Expiry date",type:"date"}
+    ]}
+  };
+
+  window.openForm=function(name,id){
+    $("#addMenu") && ($("#addMenu").style.display="none");
+    var sc=SCHEMA[name], isNew=!id;
+    var rec=id?Object.assign({},byId(name,id)):{id:uid()};
+    if(isNew){
+      sc.fields.forEach(function(f){
+        if(rec[f.k]!=null)return;
+        if(f.type==="date") rec[f.k]="";
+        else if(f.type==="select") rec[f.k]=Array.isArray(f.opts)?f.opts[0]:Object.keys(f.opts)[0];
+        else if(f.type==="number") rec[f.k]=0;
+        else if(f.type==="boolsel") rec[f.k]=false;
+        else if(f.type==="jobselect") rec[f.k]=f.locYard?"yard":"";
+        else rec[f.k]="";
+      });
+    }
+    var flags=sc.fields.map(function(f){return !!f.row;});
+    var raw=sc.fields.map(function(f){
+      var v=rec[f.k]==null?"":rec[f.k], input;
+      if(f.type==="textarea") input='<textarea name="'+f.k+'">'+esc(v)+'</textarea>';
+      else if(f.type==="select"){
+        input='<select name="'+f.k+'">'+(Array.isArray(f.opts)
+          ? f.opts.map(function(o){return '<option'+(o===v?" selected":"")+'>'+esc(o)+'</option>';}).join("")
+          : Object.keys(f.opts).map(function(kk){return '<option value="'+kk+'"'+(kk===v?" selected":"")+'>'+esc(f.opts[kk].label)+'</option>';}).join(""))+'</select>';
+      }
+      else if(f.type==="jobselect") input='<select name="'+f.k+'">'+jobOpts(v,f.locYard?"Yard / shop":"— unassigned —").replace('value=""','value="'+(f.locYard?"yard":"")+'"')+'</select>';
+      else if(f.type==="boolsel") input='<select name="'+f.k+'"><option value="false"'+(!v?" selected":"")+'>Owned</option><option value="true"'+(v?" selected":"")+'>Rented</option></select>';
+      else input='<input type="'+f.type+'" name="'+f.k+'" value="'+esc(v)+'"'+(f.req?" required":"")+(f.type==="number"?' step="any"':"")+'>';
+      return '<div class="field"><label>'+esc(f.label)+'</label>'+input+'</div>';
+    });
+    var grouped=[],i=0;
+    while(i<raw.length){
+      if(flags[i]&&flags[i+1]){grouped.push('<div class="field row2">'+strip(raw[i])+strip(raw[i+1])+'</div>');i+=2;}
+      else{grouped.push(raw[i]);i+=1;}
+    }
+    function strip(x){return x.replace('<div class="field">','<div class="field">');}
+
+    $("#modalRoot").innerHTML='<div class="modal-back" id="mb"><div class="modal" role="dialog" aria-modal="true" aria-label="'+(isNew?"New ":"Edit ")+esc(sc.title)+'">'+
+      '<header><h3>'+(isNew?"New ":"Edit ")+esc(sc.title)+'</h3><button type="button" onclick="closeForm()" aria-label="Close">×</button></header>'+
+      '<form id="rf">'+grouped.join("")+
+      '<div class="actions">'+(isNew?'<span></span>':'<button type="button" class="btn ghost" onclick="delRec(\''+name+'\',\''+rec.id+'\')">Delete</button>')+
+      '<span><button type="button" class="btn ghost" onclick="closeForm()">Cancel</button> <button type="submit" class="btn primary">'+(isNew?"Create":"Save")+'</button></span></div>'+
+      '</form></div></div>';
+    $("#mb").addEventListener("mousedown",function(e){if(e.target.id==="mb")closeForm();});
+    document.addEventListener("keydown",escClose);
+    var form=$("#rf"); var f0=form.querySelector("input,select,textarea"); if(f0)f0.focus();
+    form.addEventListener("submit",function(e){
+      e.preventDefault();
+      var data=Object.assign({},rec);
+      sc.fields.forEach(function(f){
+        var el=form.elements[f.k]; if(!el)return;
+        if(f.type==="number") data[f.k]=Number(el.value||0);
+        else if(f.type==="boolsel") data[f.k]=el.value==="true";
+        else data[f.k]=el.value;
+      });
+      upsert(name,data); closeForm(); render(); toast(sc.title+(isNew?" created":" saved"));
+    });
+  };
+  function escClose(e){if(e.key==="Escape")closeForm();}
+  window.closeForm=function(){$("#modalRoot").innerHTML="";document.removeEventListener("keydown",escClose);};
+  window.delRec=function(n,id){if(!confirm("Delete this item?"))return;remove(n,id);closeForm();render();toast("Deleted");};
+
+  /* ---------- data menu ---------- */
+  $("#dataBtn").addEventListener("click",function(){
+    var json=JSON.stringify(state,null,2);
+    $("#modalRoot").innerHTML='<div class="modal-back" id="mb"><div class="modal" role="dialog" aria-modal="true" aria-label="Data and backup">'+
+      '<header><h3>Data &amp; backup</h3><button type="button" onclick="closeForm()">×</button></header>'+
+      '<form id="rf" onsubmit="return false">'+
+      '<p class="muted" style="margin:0;font-size:var(--s-1)">Stored in this browser only. Copy the JSON to keep a backup, or export each table as CSV.</p>'+
+      '<div class="field"><label>Company name</label><input id="coName" value="'+esc(state.company||"")+'"></div>'+
+      '<div class="field"><label>Workspace JSON</label><textarea readonly style="min-height:150px;font-family:var(--font-mono);font-size:.75rem">'+esc(json)+'</textarea></div>'+
+      '<div class="actions"><button type="button" class="btn ghost" onclick="resetData()">Reset to sample data</button>'+
+      '<span><button type="button" class="btn ghost" onclick="saveCo()">Save name</button> '+
+      '<button type="button" class="btn ghost" onclick="copyJSON()">Copy JSON</button> '+
+      '<button type="button" class="btn primary" onclick="exportCSV()">Export CSV</button></span></div>'+
+      '</form></div></div>';
+    $("#mb").addEventListener("mousedown",function(e){if(e.target.id==="mb")closeForm();});
+    document.addEventListener("keydown",escClose);
+  });
+  window.saveCo=function(){var v=$("#coName").value.trim();if(v){state.company=v;save();render();toast("Name saved");}};
+  window.copyJSON=function(){var t=JSON.stringify(state,null,2);if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){toast("JSON copied");},function(){toast("Copy blocked");});};
+  window.exportCSV=function(){
+    var parts=[];
+    [["jobs",["name","client","location","phase","pm","progress","status","nextMilestone","milestoneDate","blocker"]],
+     ["crews",["name","lead","size","trade","assignedJob","assignedFrom","assignedTo"]],
+     ["equipment",["name","tag","type","location","status","rented","owner","nextService"]],
+     ["deliveries",["item","supplier","qty","jobId","expected","status"]],
+     ["compliance",["item","category","holder","expires"]]].forEach(function(pair){
+      var n=pair[0],cols=pair[1];
+      parts.push("# "+n);
+      parts.push(cols.join(","));
+      coll(n).forEach(function(r){
+        parts.push(cols.map(function(c){
+          var v=r[c]; if(c==="assignedJob"||c==="jobId"||c==="location") v=jobShort(v);
+          v=String(v==null?"":v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+        }).join(","));
+      });
+      parts.push("");
+    });
+    var txt=parts.join("\n");
+    try{
+      var b=new Blob([txt],{type:"text/csv"});var a=document.createElement("a");
+      a.href=URL.createObjectURL(b);a.download="operations-"+todayISO()+".csv";
+      document.body.appendChild(a);a.click();a.remove();toast("CSV downloaded");
+    }catch(e){ if(navigator.clipboard)navigator.clipboard.writeText(txt).then(function(){toast("Download blocked — CSV copied");}); }
+  };
+  window.resetData=function(){if(!confirm("Replace everything with the original sample data?"))return;state=seed();persist(state);closeForm();render();toast("Sample data restored");};
+
+  /* ---------- theme ---------- */
+  try{var stt=localStorage.getItem("opstracker.theme");if(stt)document.documentElement.setAttribute("data-theme",stt);}catch(e){}
+  $("#themeToggle").addEventListener("click",function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next=dark?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("opstracker.theme",next);}catch(e){}
+  });
+
+  persist(state);
+  render();
+})();
+</script>
+</body>
+</html>

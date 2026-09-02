@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Datum — Construction Project Management</title>
-<meta name="description" content="Datum: a single-file construction project management workspace — projects, schedule, milestones, punch list, daily site logs, and RFIs. Sample data: a US millwork and casework contractor." />
+<title>Project Tracker</title>
+<meta name="description" content="A single-file construction project management workspace — projects, schedule, milestones, punch list, daily site logs, and RFIs. Sample data: a US general contractor." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
@@ -360,8 +360,8 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <span class="brandmark"><span class="dot"></span>Datum<span class="sub">Construction PM</span></span>
-    <span class="company" id="companyName">Meridian Millwork</span>
+    <span class="brandmark"><span class="dot"></span>Project Tracker<span class="sub">construction</span></span>
+    <span class="company" id="companyName">Halvorsen Building Group</span>
     <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
     <button class="iconbtn" id="dataBtn" title="Data &amp; backup" aria-label="Data and backup">⋯</button>
   </div>
@@ -376,7 +376,7 @@
     <main id="app"><!-- rendered --></main>
   </div>
   <footer class="appfoot">
-    <span>Datum · single-file construction PM · data stored in this browser</span>
+    <span>Project Tracker · one project, one screen · data stored in this browser</span>
     <span id="footStamp"></span>
   </footer>
 </div>
@@ -458,7 +458,7 @@
     "medium": { label: "Medium", cls: "warn" },
     "high":   { label: "High",   cls: "bad" }
   };
-  var PHASES = ["Preconstruction", "Shop Drawings", "Submittals & Approvals", "Procurement", "Fabrication", "Finishing", "Delivery", "Installation", "Punch & Closeout"];
+  var PHASES = ["Preconstruction", "Sitework", "Foundations", "Structure", "Envelope", "MEP Rough-in", "Finishes", "Closeout"];
 
   function chip(map, key) {
     var m = map[key] || { label: key || "—", cls: "idle" };
@@ -468,102 +468,95 @@
   // ============================================================ seed data
   function seed() {
     var P = [
-      { id: "p1", code: "MM-25-041", name: "Northgate Medical Plaza — Casework Package", client: "Brennan Construction Group", location: "Austin, TX", value: 1240000, startDate: dISO(-210), targetDate: dISO(120), pm: "R. Delgado", status: "active" },
-      { id: "p2", code: "MM-25-058", name: "Riverbend Apartments Bldg C — Unit Casework", client: "Halcyon Residential", location: "San Marcos, TX", value: 685000, startDate: dISO(-140), targetDate: dISO(35), pm: "J. Whitfield", status: "active" },
-      { id: "p3", code: "MM-25-066", name: "Cedar & Vine — Restaurant Millwork & Bar", client: "Cedar Hospitality Group", location: "Round Rock, TX", value: 312000, startDate: dISO(-70), targetDate: dISO(95), pm: "J. Whitfield", status: "active" },
-      { id: "p4", code: "MM-25-071", name: "Lakeline Corporate Center — TI Millwork", client: "Vantage Builders", location: "Cedar Park, TX", value: 940000, startDate: dISO(-55), targetDate: dISO(210), pm: "M. Okafor", status: "on-hold" }
+      { id: "p1", code: "HBG-25-08", name: "Silverado Middle School — Classroom Wing", client: "Sierra Unified School District", location: "Reno, NV", value: 8600000, startDate: dISO(-200), targetDate: dISO(140), pm: "R. Delgado", status: "active" },
+      { id: "p2", code: "HBG-25-11", name: "Tahoe Ridge Medical Office Building", client: "Summit Health Partners", location: "Carson City, NV", value: 5200000, startDate: dISO(-150), targetDate: dISO(160), pm: "J. Whitfield", status: "active" },
+      { id: "p3", code: "HBG-25-14", name: "Downtown Transit Center — Phase 1", client: "Regional Transit Authority", location: "Reno, NV", value: 3100000, startDate: dISO(-90), targetDate: dISO(95), pm: "M. Okafor", status: "active" },
+      { id: "p4", code: "HBG-25-16", name: "Willowbrook Apartments — Bldg A & B", client: "Willowbrook Residential", location: "Sparks, NV", value: 12400000, startDate: dISO(-40), targetDate: dISO(260), pm: "M. Okafor", status: "on-hold" }
     ];
     var T = [
-      // p1
-      t("p1", "Field verify & site dimensions", "Preconstruction", "R. Delgado", -210, -190, "done", 100),
-      t("p1", "Shop drawings — Levels 1-3 casework", "Shop Drawings", "Drafting: K. Moreau", -188, -150, "done", 100),
-      t("p1", "Submittals & finish samples to architect", "Submittals & Approvals", "R. Delgado", -150, -95, "done", 100),
-      t("p1", "Panel & hardware procurement", "Procurement", "Purchasing: T. Ruiz", -95, 10, "in-progress", 72),
-      t("p1", "Fabrication — exam room casework, 46 units", "Fabrication", "Shop: Line 2", -30, 55, "in-progress", 40),
-      t("p1", "Finishing & edgebanding", "Finishing", "Shop: Finish Dept", 20, 100, "not-started", 0),
-      t("p1", "Delivery & installation — Levels 1-3", "Installation", "Install crew A", 60, 115, "not-started", 0),
-      t("p1", "Punch list & closeout documents", "Punch & Closeout", "R. Delgado", 105, 120, "not-started", 0),
-      // p2
-      t("p2", "Unit type takeoff — 184 units", "Preconstruction", "J. Whitfield", -140, -125, "done", 100),
-      t("p2", "Shop drawings — kitchen & vanity typicals", "Shop Drawings", "Drafting: K. Moreau", -125, -80, "done", 100),
-      t("p2", "Material release — melamine & solid surface", "Procurement", "Purchasing: T. Ruiz", -85, -45, "done", 100),
-      t("p2", "Fabrication — kitchen cabinets, Bldg C", "Fabrication", "Shop: Line 1", -50, 5, "in-progress", 84),
-      t("p2", "Fabrication — vanities & linen cabinets", "Fabrication", "Shop: Line 1", -40, 10, "in-progress", 66),
-      t("p2", "Install — floors 1 through 4", "Installation", "Install crew B", 0, 30, "not-started", 0),
-      t("p2", "Punch walk with GC & closeout", "Punch & Closeout", "J. Whitfield", 25, 35, "not-started", 0),
-      // p3
-      t("p3", "Design intent review with owner", "Preconstruction", "J. Whitfield", -70, -55, "done", 100),
-      t("p3", "Shop drawings — bar & back bar", "Shop Drawings", "Drafting: K. Moreau", -55, -20, "done", 100),
-      t("p3", "Fabrication — banquettes & wall paneling", "Fabrication", "Shop: Line 2", -25, 5, "in-progress", 78),
-      t("p3", "Solid surface bar top — outsourced", "Procurement", "Sub: Lonestar Surfaces", -5, 45, "blocked", 15),
-      t("p3", "Finishing — stain & catalyzed lacquer", "Finishing", "Shop: Finish Dept", 35, 70, "not-started", 0),
-      t("p3", "Delivery & field installation", "Installation", "Install crew A", 40, 88, "not-started", 0),
-      // p4
-      t("p4", "Field verify — tenant floors 4-6", "Preconstruction", "M. Okafor", -55, -30, "blocked", 45),
-      t("p4", "Shop drawings — reception & conference", "Shop Drawings", "Drafting: K. Moreau", -20, 25, "not-started", 0),
-      t("p4", "Fabrication — reception desk & credenzas", "Fabrication", "Shop: Line 2", 20, 120, "not-started", 0),
-      t("p4", "Installation — floors 4 through 6", "Installation", "Install crew B", 30, 150, "not-started", 0)
+      t("p1", "Bid buyout & subcontracts", "Preconstruction", "R. Delgado", -200, -175, "done", 100),
+      t("p1", "Sitework & underground utilities", "Sitework", "Sub: Basin Excavation", -172, -120, "done", 100),
+      t("p1", "Spread footings & grade beams", "Foundations", "R. Delgado", -120, -70, "done", 100),
+      t("p1", "Structural steel & metal deck", "Structure", "Sub: Ironline Steel", -70, 15, "in-progress", 66),
+      t("p1", "Roofing & exterior sheathing", "Envelope", "Sub: Summit Roofing", -10, 55, "in-progress", 28),
+      t("p1", "MEP rough-in", "MEP Rough-in", "Sub: MEP consortium", 20, 95, "not-started", 0),
+      t("p1", "Interior finishes & fixtures", "Finishes", "Self-perform + subs", 70, 130, "not-started", 0),
+      t("p1", "Punch, commissioning & closeout", "Closeout", "R. Delgado", 125, 140, "not-started", 0),
+      t("p2", "Preconstruction & permits", "Preconstruction", "J. Whitfield", -150, -125, "done", 100),
+      t("p2", "Mass grading & storm drainage", "Sitework", "Sub: Basin Excavation", -122, -70, "done", 100),
+      t("p2", "Slab on grade & tilt panels", "Structure", "Self-perform concrete", -70, 5, "in-progress", 82),
+      t("p2", "Panel erection & bracing", "Structure", "Sub: Ironline Steel", -50, 15, "in-progress", 54),
+      t("p2", "Roof & storefront glazing", "Envelope", "Sub: Clearview Glazing", 10, 80, "not-started", 0),
+      t("p2", "MEP rough & medical gas", "MEP Rough-in", "Sub: MEP consortium", 30, 110, "not-started", 0),
+      t("p2", "TI buildout — shell + suites", "Finishes", "Self-perform + subs", 90, 155, "not-started", 0),
+      t("p3", "Design-assist & GMP", "Preconstruction", "M. Okafor", -90, -70, "done", 100),
+      t("p3", "Demolition of existing lot", "Sitework", "Sub: Basin Excavation", -68, -50, "done", 100),
+      t("p3", "Canopy foundations & site walls", "Foundations", "Self-perform concrete", -50, 5, "in-progress", 72),
+      t("p3", "Steel canopy & platform", "Structure", "Sub: Ironline Steel", -5, 45, "blocked", 18),
+      t("p3", "Site concrete, paving & striping", "Sitework", "Sub: Basin Excavation", 35, 80, "not-started", 0),
+      t("p3", "Lighting, signage & final inspection", "Closeout", "M. Okafor", 70, 92, "not-started", 0),
+      t("p4", "Preconstruction (held at GMP)", "Preconstruction", "M. Okafor", -40, 20, "blocked", 45),
+      t("p4", "Bldg A foundations", "Foundations", "Self-perform concrete", 20, 70, "not-started", 0),
+      t("p4", "Bldg A wood framing", "Structure", "Sub: Frameworks NV", 55, 150, "not-started", 0),
+      t("p4", "Site development & utilities", "Sitework", "Sub: Basin Excavation", 40, 170, "not-started", 0)
     ];
     function t(projectId, name, phase, assignee, s, f, status, progress) {
       return { id: uid(), projectId: projectId, name: name, phase: phase, assignee: assignee, start: dISO(s), finish: dISO(f), status: status, progress: progress };
     }
     var M = [
-      m("p1", "Shop drawings approved", -95, "met"),
-      m("p1", "Material on hand — Levels 1-3", 14, "at-risk"),
-      m("p1", "Fabrication complete", 70, "upcoming"),
-      m("p1", "Substantial completion", 118, "upcoming"),
-      m("p2", "First 4 floors released to install", -20, "met"),
-      m("p2", "Bldg C fabrication complete", 8, "at-risk"),
-      m("p2", "Final walk & closeout", 35, "upcoming"),
-      m("p3", "Bar top template approved", 6, "at-risk"),
-      m("p3", "Restaurant opening — hard date", 45, "upcoming"),
-      m("p4", "Field dimensions released", -5, "missed"),
-      m("p4", "Tenant floors ready for install", 90, "upcoming")
+      m("p1", "Steel topping out", -30, "met"),
+      m("p1", "Building dry-in", 20, "at-risk"),
+      m("p1", "Substantial completion", 138, "upcoming"),
+      m("p2", "Tilt panels complete", -8, "met"),
+      m("p2", "Shell complete", 30, "at-risk"),
+      m("p2", "TI turnover", 158, "upcoming"),
+      m("p3", "Canopy steel set", 8, "at-risk"),
+      m("p3", "Transit center opening — hard date", 93, "upcoming"),
+      m("p4", "Financing close", -5, "missed"),
+      m("p4", "Notice to proceed", 60, "upcoming")
     ];
     function m(projectId, name, off, status) { return { id: uid(), projectId: projectId, name: name, date: dISO(off), status: status }; }
     var PU = [
-      pu("p1", "L2 — Exam 214", "Base cabinet 1/2\" out of level, shim required", "Millwork", -12, 5, "high", "open"),
-      pu("p1", "L1 — Reception", "Solid surface seam visible at return, needs refinish", "Solid Surface", -9, 8, "medium", "in-progress"),
-      pu("p1", "L3 — Nurse station", "Wrong pull hardware installed, 14 doors", "Hardware", -6, 10, "high", "open"),
-      pu("p1", "L1 — Corridor A", "Edgebanding lifted on 3 upper cabinets", "Millwork", -20, -6, "low", "closed"),
-      pu("p2", "Unit 314", "Cabinet door reveal inconsistent, whole run", "Millwork", -8, 6, "high", "open"),
-      pu("p2", "Unit 208", "Vanity top overhang short 3/4\"", "Solid Surface", -5, 7, "medium", "in-progress"),
-      pu("p2", "Unit 402", "Missing toe kick, 2 LF", "Millwork", -3, 12, "low", "open"),
-      pu("p3", "Bar — north end", "Field dimension conflict with structural column", "Millwork", -4, 9, "high", "open"),
-      pu("p3", "Banquette run B", "Stain color off from approved sample", "Finish", -2, 5, "medium", "open"),
-      pu("p4", "Floor 5 — Reception", "Blocking not installed by GC, install held", "Coordination", -10, -2, "medium", "closed")
+      pu("p1", "Gridline 6 — Level 2", "Deck weld not per detail, 3 locations", "Structural", -12, 4, "high", "open"),
+      pu("p1", "South stair", "Handrail height 2 in. low", "Metals", -8, 9, "medium", "open"),
+      pu("p1", "Roof — NW corner", "Ponding at drain, needs re-slope", "Roofing", -6, 10, "high", "open"),
+      pu("p2", "Panel P-14", "Chip at reveal, patch and refinish", "Concrete", -18, -4, "low", "closed"),
+      pu("p2", "Loading dock", "Bollard spacing wider than plan", "Sitework", -5, 8, "medium", "in-progress"),
+      pu("p3", "Canopy column C-3", "Anchor bolt projection short 3/4 in.", "Structural", -4, 9, "high", "open"),
+      pu("p3", "ADA ramp — main entry", "Cross-slope 2.4%, exceeds maximum", "Concrete", -3, 6, "high", "open"),
+      pu("p4", "Site — north perimeter", "Erosion control fence down after wind", "Sitework", -10, -2, "medium", "closed")
     ];
     function pu(projectId, location, description, trade, raised, due, severity, status) {
       return { id: uid(), projectId: projectId, location: location, description: description, trade: trade, raised: dISO(raised), due: dISO(due), severity: severity, status: status };
     }
     var L = [
-      lg("p1", -1, "82°F, clear", 14, "Install crew A on Level 2, exam rooms 210-218. Set 22 base cabinets and 14 uppers. Received panel delivery, 2 units of maple veneer core.", "GC blocking missing in rooms 216-218. Install skipped ahead, will backtrack."),
-      lg("p1", -3, "88°F, humid", 16, "Level 1 reception casework set and scribed. Solid surface template taken for reception transaction top.", ""),
-      lg("p2", -1, "91°F, clear", 11, "Shop Line 1 running Bldg C kitchen boxes — 34 completed. Edgebander down for 90 min, belt change.", "Edgebander downtime 1.5 hrs. Maintenance scheduled Friday."),
-      lg("p2", -2, "86°F, partly cloudy", 12, "Kitchen boxes 28 completed. Vanity cabinet parts cut and banded for floors 1-2.", ""),
-      lg("p3", -1, "79°F, overcast", 6, "Banquette frames assembled, wall paneling milled. Bar top still with Lonestar Surfaces — no ship date confirmed.", "Bar top vendor 2 weeks late. Opening date at risk, GC notified in writing."),
-      lg("p4", -6, "84°F, clear", 2, "Project on hold. Drafting only — no shop or field activity. Awaiting released field dimensions from GC.", "Hold continues. Tenant floors not turned over by GC as scheduled.")
+      lg("p1", -1, "48°F, windy", 34, "Steel erection Gridlines 4-7, Level 2. Deck placed bays A-C. Rebar tied for topping slab.", "High winds stopped crane ops after 2pm. Half day lost on erection."),
+      lg("p1", -3, "52°F, clear", 30, "Roof sheathing NW quadrant. MEP coordinating overhead rough-in with steel.", ""),
+      lg("p2", -1, "61°F, clear", 22, "Tilt panels 12-16 poured. Panel P-9 stripped and braced. Storm drain tie-in at MH-3.", ""),
+      lg("p2", -2, "58°F, partly cloudy", 20, "SOG pour, north half. Panel forms set for pour 4.", "Concrete truck delay 90 min, batch plant backed up."),
+      lg("p3", -1, "45°F, overcast", 9, "Canopy footings F-1 through F-4 poured. Site retaining wall CMU, 3rd course. Awaiting steel — no delivery date.", "Steel canopy 2 weeks late from fabricator. Opening date at risk, owner notified."),
+      lg("p4", -6, "55°F, clear", 0, "Project on hold — financing not closed. Site secured, erosion control maintained.", "Hold continues into third week. NTP pending lender approval.")
     ];
     function lg(projectId, off, weather, manpower, work, issues) {
       return { id: uid(), projectId: projectId, date: dISO(off), weather: weather, manpower: manpower, work: work, issues: issues };
     }
     var R = [
-      rfi("p1", "RFI-041", "Exam room base cabinet depth vs. plumbing rough-in conflict", "Architect", -10, -3, "open", ""),
-      rfi("p1", "RFI-039", "Reception transaction top height — ADA clarification", "Architect", -16, -9, "answered", "Lower section to 34\" AFF per revised detail A-503 rev.2, issued " + fmtDate(dISO(-8)) + "."),
-      rfi("p1", "RFI-035", "Substitution request: alternate plastic laminate", "Architect", -28, -20, "closed", "Approved as equal. See submittal log item 112."),
-      rfi("p2", "RFI-018", "Unit 314 cabinet run — dimension conflict with as-built wall", "GC — Halcyon Residential", -7, 0, "open", ""),
-      rfi("p2", "RFI-015", "Added linen cabinet, units 401-418", "GC — Halcyon Residential", -14, -7, "answered", "Approved as change order. Proceed, pricing to follow."),
-      rfi("p3", "RFI-006", "Bar top seam location and support requirements", "Sub: Lonestar Surfaces", -5, 2, "open", ""),
-      rfi("p4", "RFI-003", "Reception desk layout revised after tenant change", "Vantage Builders", -12, -5, "open", "")
+      rfi("p1", "RFI-052", "Level 2 deck opening for RTU-3 not shown on structural", "Structural Engineer", -9, -2, "open", ""),
+      rfi("p1", "RFI-048", "Storefront head height conflict with structural beam", "Architect", -15, -8, "answered", "Drop beam 4 in. per SK-12, issued " + fmtDate(dISO(-7)) + "."),
+      rfi("p1", "RFI-044", "Substitution: alternate roof membrane manufacturer", "Architect", -26, -18, "closed", "Approved as equal. See submittal 118."),
+      rfi("p2", "RFI-023", "Panel P-14 reveal dimension conflicts with door opening", "Architect", -6, 1, "open", ""),
+      rfi("p2", "RFI-019", "Added floor drains in three suites per tenant", "Owner", -13, -6, "answered", "Approved as change order. Proceed, pricing to follow."),
+      rfi("p3", "RFI-011", "Canopy anchor bolt template tolerance", "Steel Fabricator", -4, 3, "open", ""),
+      rfi("p4", "RFI-004", "Bldg A foundation revised after geotech addendum", "Geotechnical Engineer", -11, -4, "open", "")
     ];
     function rfi(projectId, number, subject, to, raised, needed, status, response) {
       return { id: uid(), projectId: projectId, number: number, subject: subject, to: to, raised: dISO(raised), needed: dISO(needed), status: status, response: response };
     }
-    return { company: "Meridian Millwork", projects: P, tasks: T, milestones: M, punch: PU, logs: L, rfis: R, savedAt: new Date().toISOString() };
+    return { company: "Halvorsen Building Group", projects: P, tasks: T, milestones: M, punch: PU, logs: L, rfis: R, savedAt: new Date().toISOString() };
   }
 
   // ============================================================ store
-  var KEY = "datum.v1";
+  var KEY = "projtracker.v1";
   var state = load();
   function load() {
     try {
@@ -1107,7 +1100,7 @@
       var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
       var a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "datum-" + todayISO() + ".json";
+      a.download = "project-tracker-" + todayISO() + ".json";
       document.body.appendChild(a); a.click(); a.remove();
       toast("Download started");
     } catch (e) { toast("Download not available here — use Copy JSON"); }
@@ -1118,7 +1111,7 @@
   };
 
   // ============================================================ theme
-  var themeKey = "datum.theme";
+  var themeKey = "projtracker.theme";
   (function initTheme() {
     try {
       var saved = localStorage.getItem(themeKey);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>B2B Lead Pipeline</title>
+<title>Lead Generation Pipeline</title>
 <meta name="description" content="A workflow that sweeps a metro for prospective clients — pulls business listings, filters, scrapes each site, and extracts contact and firmographic data into one sheet. Interactive demo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -130,7 +130,7 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <span class="brandmark"><span class="dot"></span>Prospector<span class="sub">B2B Lead Pipeline</span></span>
+    <span class="brandmark"><span class="dot"></span>Lead Pipeline<span class="sub">prospecting</span></span>
     <span class="tb-spacer"></span>
     <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
   </div>
@@ -163,11 +163,11 @@
         <div class="rf">
           <label for="industry">Target industry</label>
           <select id="industry">
-            <option value="millwork">Architectural millwork shops</option>
-            <option value="cabinet">Cabinet manufacturers</option>
-            <option value="kbdealer">Kitchen &amp; bath dealers</option>
-            <option value="gc">Commercial general contractors</option>
-            <option value="closet">Closet &amp; storage companies</option>
+            <option value="gc">General contractors</option>
+            <option value="commercial">Commercial builders</option>
+            <option value="designbuild">Design-build firms</option>
+            <option value="subs">Specialty subcontractors</option>
+            <option value="homebuilder">Home builders</option>
           </select>
         </div>
         <div class="rf">
@@ -217,7 +217,7 @@
     </main>
   </div>
   <footer class="appfoot">
-    <span>Prospector · pipeline demo · simulated data source</span>
+    <span>Lead Pipeline · demo · simulated data source</span>
     <span id="footStamp"></span>
   </footer>
 </div>
@@ -250,11 +250,11 @@
     "Atlanta, GA":["Atlanta","Marietta","Alpharetta","Roswell","Sandy Springs","Smyrna","Dunwoody","Kennesaw","Duluth","Johns Creek","Decatur","Peachtree City","Woodstock","Lawrenceville"]
   };
   var IND = {
-    millwork:{cat:"Architectural millwork", names:["Summit","Ironwood","Keystone","Blackwater","Meridian","Cypress","Foundry","Copper Creek","Northline","Hearth & Grain","Sawtooth","Union","Timberline","Redwood","Anvil"], suffix:["Millwork","Woodworks","Custom Woodworking","Architectural Millwork","Cabinet Co."]},
-    cabinet:{cat:"Cabinet manufacturer", names:["Precision","Heritage","Cornerstone","Vantage","Crestview","Oakmont","Sterling","Legacy","Highpoint","Windham","Bridgewater","Ashford"], suffix:["Cabinetry","Cabinet Works","Cabinet Manufacturing","Custom Cabinets","Kitchens"]},
-    kbdealer:{cat:"Kitchen & bath dealer", names:["Metro","Bella","Artisan","Elite","Signature","Modern Home","Studio 7","The Kitchen Place","Coastal","Urban","Hillcrest","Verano"], suffix:["Kitchen & Bath","Design Studio","Kitchens & Baths","Home Design","Cabinetry & Design"]},
-    gc:{cat:"General contractor", names:["Brennan","Halcyon","Vantage","Cornerstone","Bluepeak","Ironclad","Landmark","Meridian","Granite Ridge","Fortis","Anchor","Kearney"], suffix:["Construction","Builders","Construction Group","Contractors","Building Co."]},
-    closet:{cat:"Closet & storage", names:["ClosetCraft","SpaceWise","Tailored","Nook","OrderlyHome","California-style","Clear Space","Fitwell","StowPro","Neat Method"], suffix:["Closets","Custom Closets","Storage Systems","Closet Design","Organized Spaces"]}
+    gc:{cat:"General contractor", names:["Brennan","Halcyon","Cornerstone","Bluepeak","Ironclad","Landmark","Granite Ridge","Fortis","Anchor","Kearney","Summit","Vantage"], suffix:["Construction","Builders","Construction Group","Contractors","Building Co."]},
+    commercial:{cat:"Commercial builder", names:["Meridian","Redhawk","Copperline","Northgate","Sterling","Keystone","Vanguard","Highpoint","Cascade","Foundry","Ridgeline","Basalt"], suffix:["Commercial","Construction","Builders","Contractors","Building Group"]},
+    designbuild:{cat:"Design-build firm", names:["Axis","Form","Praxis","Nexus","Latitude","Method","Cohesive","Blueprint","Studio North","Datum Works","Wright","Keel"], suffix:["Design-Build","Builders","Studio","Group","Construction"]},
+    subs:{cat:"Specialty subcontractor", names:["Ironline","Basin","Clearview","Apex","TrueLine","Delta","Verde","Frontline","Summit","Precision","Cascade","Kestrel"], suffix:["Mechanical","Electric","Concrete","Steel","Glazing","Roofing","Excavation"]},
+    homebuilder:{cat:"Home builder", names:["Willowbrook","Sierra Vista","Desert Vista","Copper Creek","Homestead","Talon","Whitfield","Crestview","Parkside","Ridgeview","Northstar","Cottonwood"], suffix:["Homes","Home Builders","Residential","Custom Homes","Communities"]}
   };
   var LOST = ["chain / franchise — no local site","site is a Facebook page only","no website listed","site down / parked domain","directory listing, not a business site"];
 

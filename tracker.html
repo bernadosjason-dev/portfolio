@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lead Pipeline Tracker</title>
-<meta name="description" content="Track every lead from first inquiry to awarded job — stage board, win rate by product line, source and buyer type, and the funnel drop-off in between. Sample data included." />
+<title>Sales Pipeline Tracker</title>
+<meta name="description" content="Track every lead from first inquiry to awarded job — stage board, win rate by source, buyer type and bid type, and the funnel drop-off in between. Sample data included." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
@@ -142,14 +142,14 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <span class="brandmark"><span class="dot"></span>Funnel<span class="sub">Lead Pipeline Tracker</span></span>
+    <span class="brandmark"><span class="dot"></span>Sales Pipeline<span class="sub">leads to close</span></span>
     <span class="tb-spacer"></span>
     <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
     <button class="iconbtn" id="dataBtn" title="Data &amp; backup" aria-label="Data and backup">⋯</button>
   </div>
   <main id="app"></main>
   <footer class="appfoot">
-    <span>Funnel · lead pipeline tracker · data stored in this browser</span>
+    <span>Sales Pipeline Tracker · data stored in this browser</span>
     <span id="footStamp"></span>
   </footer>
 </div>
@@ -175,27 +175,27 @@
   var STAGES=["Inquiry","Site visit set","Site visit done","Quote issued","Deposit paid","Awarded"];
   var STAGE_DATE={"Inquiry":"dInquiry","Site visit set":"dVisitSet","Site visit done":"dVisitDone","Quote issued":"dQuote","Deposit paid":"dDeposit","Awarded":"dAwarded"};
   var SOURCES=["Referral","Website","Trade show","Cold outreach","Repeat client","Online estimator"];
-  var BUYERS=["General contractor","Designer / architect","Developer","Direct homeowner"];
-  var PLINES=["Kitchen","Closet","Restroom partition","Vanity","Media wall","Office casework","Bar unit"];
+  var BUYERS=["Developer","Public owner","Private owner / business","Architect / CM"];
+  var PLINES=["Ground-up commercial","Tenant improvement","Renovation","Site & civil","Design-build"];
   var LOST_REASONS=["Price","Lost to competitor","Scope changed / cancelled","Timeline","No decision / went quiet"];
 
   /* ---------- seed ---------- */
   function seed(){
     function L(o){return Object.assign({id:uid(),plines:[],lostReason:"",notes:"",quote:0,deposit:0,awarded:0,
       dInquiry:"",dVisitSet:"",dVisitDone:"",dQuote:"",dDeposit:"",dAwarded:""},o);}
-    return {company:"Meridian Millwork", leads:[
-      L({name:"Northgate Medical Plaza", contact:"Brennan Construction Group", location:"Austin, TX", source:"Referral", buyer:"General contractor", plines:["Office casework"], stage:"Awarded", quote:1240000, deposit:124000, awarded:1240000, dInquiry:dISO(-96),dVisitSet:dISO(-92),dVisitDone:dISO(-85),dQuote:dISO(-70),dDeposit:dISO(-58),dAwarded:dISO(-52)}),
-      L({name:"Riverbend Apartments Bldg C", contact:"Halcyon Residential", location:"San Marcos, TX", source:"Repeat client", buyer:"Developer", plines:["Kitchen","Vanity"], stage:"Awarded", quote:685000, deposit:68500, awarded:660000, dInquiry:dISO(-78),dVisitSet:dISO(-74),dVisitDone:dISO(-68),dQuote:dISO(-55),dDeposit:dISO(-44),dAwarded:dISO(-40)}),
-      L({name:"Cedar & Vine restaurant", contact:"Cedar Hospitality Group", location:"Round Rock, TX", source:"Trade show", buyer:"Designer / architect", plines:["Bar unit","Media wall"], stage:"Deposit paid", quote:312000, deposit:31200, dInquiry:dISO(-40),dVisitSet:dISO(-36),dVisitDone:dISO(-30),dQuote:dISO(-18),dDeposit:dISO(-6)}),
-      L({name:"Lakeline Corporate Center TI", contact:"Vantage Builders", location:"Cedar Park, TX", source:"Website", buyer:"General contractor", plines:["Office casework"], stage:"Quote issued", quote:940000, dInquiry:dISO(-30),dVisitSet:dISO(-26),dVisitDone:dISO(-19),dQuote:dISO(-4)}),
-      L({name:"Hillside kitchen remodel", contact:"D. & M. Okafor", location:"Georgetown, TX", source:"Online estimator", buyer:"Direct homeowner", plines:["Kitchen"], stage:"Quote issued", quote:58000, dInquiry:dISO(-22),dVisitSet:dISO(-18),dVisitDone:dISO(-12),dQuote:dISO(-3)}),
-      L({name:"Sterling Heights model units", contact:"Sterling Homes", location:"Pflugerville, TX", source:"Cold outreach", buyer:"Developer", plines:["Kitchen","Closet","Vanity"], stage:"Site visit done", quote:0, dInquiry:dISO(-16),dVisitSet:dISO(-12),dVisitDone:dISO(-5)}),
-      L({name:"Dr. Alvarez dental office", contact:"Alvarez Family Dental", location:"Kyle, TX", source:"Referral", buyer:"Direct homeowner", plines:["Office casework","Restroom partition"], stage:"Site visit set", quote:0, dInquiry:dISO(-9),dVisitSet:dISO(-3)}),
-      L({name:"Brookfield townhomes ph.2", contact:"Brookfield Development", location:"Leander, TX", source:"Repeat client", buyer:"Developer", plines:["Kitchen","Vanity","Closet"], stage:"Inquiry", quote:0, dInquiry:dISO(-4)}),
-      L({name:"The Grove clubhouse", contact:"Grove HOA", location:"Buda, TX", source:"Website", buyer:"Designer / architect", plines:["Bar unit","Media wall"], stage:"Inquiry", quote:0, dInquiry:dISO(-2)}),
-      L({name:"Maple St. custom home", contact:"J. Whitfield, architect", location:"Dripping Springs, TX", source:"Referral", buyer:"Designer / architect", plines:["Kitchen","Closet","Media wall"], stage:"Lost", quote:186000, lostReason:"Lost to competitor", dInquiry:dISO(-64),dVisitSet:dISO(-60),dVisitDone:dISO(-54),dQuote:dISO(-42)}),
-      L({name:"Parkview office fit-out", contact:"Parkview Partners", location:"Manor, TX", source:"Cold outreach", buyer:"General contractor", plines:["Office casework"], stage:"Lost", quote:410000, lostReason:"Price", dInquiry:dISO(-58),dVisitSet:dISO(-53),dVisitDone:dISO(-47),dQuote:dISO(-33)}),
-      L({name:"Willow Creek amenity center", contact:"Willow Creek Devco", location:"Hutto, TX", source:"Trade show", buyer:"Developer", plines:["Kitchen","Bar unit"], stage:"Lost", quote:0, lostReason:"No decision / went quiet", dInquiry:dISO(-50),dVisitSet:dISO(-45),dVisitDone:dISO(-38)})
+    return {company:"Redhawk Construction", leads:[
+      L({name:"Northgate Medical Center — CMAR", contact:"Summit Health Partners", location:"Reno, NV", source:"Referral", buyer:"Developer", plines:["Ground-up commercial"], stage:"Awarded", quote:8600000, deposit:0, awarded:8600000, dInquiry:dISO(-110),dVisitSet:dISO(-104),dVisitDone:dISO(-96),dQuote:dISO(-78),dDeposit:dISO(-60),dAwarded:dISO(-54)}),
+      L({name:"Willow Creek Elementary — GMP", contact:"Sierra Unified School District", location:"Sparks, NV", source:"Repeat client", buyer:"Public owner", plines:["Ground-up commercial"], stage:"Awarded", quote:12400000, deposit:0, awarded:12100000, dInquiry:dISO(-88),dVisitSet:dISO(-82),dVisitDone:dISO(-75),dQuote:dISO(-58),dDeposit:dISO(-46),dAwarded:dISO(-40)}),
+      L({name:"Third Street Lofts — 60 units", contact:"Basalt Residential", location:"Reno, NV", source:"Trade show", buyer:"Developer", plines:["Ground-up commercial"], stage:"Deposit paid", quote:9100000, deposit:250000, dInquiry:dISO(-44),dVisitSet:dISO(-40),dVisitDone:dISO(-33),dQuote:dISO(-18),dDeposit:dISO(-5)}),
+      L({name:"Sierra Tech HQ — TI, 3 floors", contact:"Sierra Technologies", location:"Carson City, NV", source:"Website", buyer:"Private owner / business", plines:["Tenant improvement"], stage:"Quote issued", quote:2400000, dInquiry:dISO(-30),dVisitSet:dISO(-25),dVisitDone:dISO(-18),dQuote:dISO(-4)}),
+      L({name:"Meadowood retail pad — shell", contact:"Meadowood Partners", location:"Reno, NV", source:"Cold outreach", buyer:"Developer", plines:["Ground-up commercial"], stage:"Quote issued", quote:1900000, dInquiry:dISO(-24),dVisitSet:dISO(-19),dVisitDone:dISO(-11),dQuote:dISO(-3)}),
+      L({name:"County ops facility — renovation", contact:"Washoe County", location:"Reno, NV", source:"Referral", buyer:"Public owner", plines:["Renovation"], stage:"Site visit done", quote:0, dInquiry:dISO(-17),dVisitSet:dISO(-12),dVisitDone:dISO(-4)}),
+      L({name:"Ridgeline warehouse — design-build", contact:"Ridgeline Logistics", location:"Fernley, NV", source:"Repeat client", buyer:"Developer", plines:["Design-build"], stage:"Site visit set", quote:0, dInquiry:dISO(-10),dVisitSet:dISO(-2)}),
+      L({name:"Downtown parking structure — sitework", contact:"Regional Transit Authority", location:"Reno, NV", source:"Website", buyer:"Public owner", plines:["Site & civil"], stage:"Inquiry", quote:0, dInquiry:dISO(-4)}),
+      L({name:"Hillside custom residence", contact:"The Andersons", location:"Incline Village, NV", source:"Referral", buyer:"Private owner / business", plines:["Renovation"], stage:"Inquiry", quote:0, dInquiry:dISO(-2)}),
+      L({name:"Cornerstone church addition", contact:"Cornerstone Fellowship", location:"Sparks, NV", source:"Referral", buyer:"Private owner / business", plines:["Renovation"], stage:"Lost", quote:1400000, lostReason:"Lost to competitor", dInquiry:dISO(-66),dVisitSet:dISO(-60),dVisitDone:dISO(-52),dQuote:dISO(-40)}),
+      L({name:"Airport concourse fit-out", contact:"Reno-Tahoe Airport Authority", location:"Reno, NV", source:"Cold outreach", buyer:"Public owner", plines:["Tenant improvement"], stage:"Lost", quote:4100000, lostReason:"Price", dInquiry:dISO(-58),dVisitSet:dISO(-53),dVisitDone:dISO(-45),dQuote:dISO(-32)}),
+      L({name:"Business park spec building", contact:"Damonte Ranch Devco", location:"Reno, NV", source:"Trade show", buyer:"Developer", plines:["Ground-up commercial"], stage:"Lost", quote:0, lostReason:"No decision / went quiet", dInquiry:dISO(-50),dVisitSet:dISO(-45),dVisitDone:dISO(-38)})
     ], savedAt:new Date().toISOString()};
   }
 
