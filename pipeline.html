@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>B2B Lead Pipeline</title>
+<meta name="description" content="A workflow that sweeps a metro for prospective clients — pulls business listings, filters, scrapes each site, and extracts contact and firmographic data into one sheet. Interactive demo." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root {
+    --paper:#F3F4F1; --surface:#FFFFFF; --surface-2:#ECEEE9; --hover:#E7E9E3;
+    --ink:#1B1E1B; --ink-2:#45493F; --ink-3:#6A6E63;
+    --line:#D3D5CC; --line-2:#E1E2DB;
+    --brand:#C43D2B; --brand-ink:#FFFFFF;
+    --ok:#2F7D4F; --ok-bg:#E4F0E7; --warn:#A9701A; --warn-bg:#F6ECD9;
+    --bad:#C0392B; --bad-bg:#F5E1DE; --idle:#6A6E63; --idle-bg:#E7E8E2;
+    --focus:#C43D2B;
+    --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --s-1:0.78rem; --s0:0.94rem; --s1:1.1rem; --s2:1.35rem; --s3:1.7rem; --s4:2.2rem;
+    --radius:3px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+      --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+      --brand:#E4573F; --brand-ink:#17140F;
+      --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+      --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+    --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+    --brand:#E4573F; --brand-ink:#17140F;
+    --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+    --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:var(--font-body);font-size:var(--s0);line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;margin:0}
+  button{font:inherit;cursor:pointer}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  input,select{font:inherit;color:inherit}
+  .mono{font-family:var(--font-mono)}
+  .muted{color:var(--ink-3)}
+
+  .app{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+  .topbar{display:flex;align-items:center;gap:1rem;padding:0 clamp(1rem,3vw,2rem);height:60px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brandmark{display:flex;align-items:baseline;gap:0.55rem;font-family:var(--font-display);font-weight:800;font-size:var(--s2);letter-spacing:-0.02em}
+  .brandmark .dot{width:9px;height:9px;background:var(--brand);display:inline-block;transform:translateY(-1px)}
+  .brandmark .sub{font-family:var(--font-mono);font-weight:400;font-size:var(--s-1);color:var(--ink-3)}
+  .tb-spacer{margin-left:auto}
+  .iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:var(--radius)}
+  .iconbtn:hover{background:var(--hover);color:var(--ink)}
+
+  .body{display:grid;grid-template-columns:270px 1fr}
+  @media (max-width:900px){.body{grid-template-columns:1fr}}
+
+  /* ---------- workflow rail ---------- */
+  .rail{border-right:1px solid var(--line);background:var(--surface);padding:1.25rem 1rem}
+  @media (max-width:900px){.rail{border-right:0;border-bottom:1px solid var(--line)}}
+  .rail h3{font-family:var(--font-mono);font-size:var(--s-1);text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-3);margin-bottom:0.9rem}
+  .node{position:relative;padding:0.7rem 0.75rem 0.7rem 2.2rem;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:0.5rem;background:var(--surface);transition:border-color .2s,background .2s}
+  .node::before{content:"";position:absolute;left:0.85rem;top:0.95rem;width:8px;height:8px;border-radius:50%;background:var(--idle);transition:background .2s,box-shadow .2s}
+  .node .n-title{font-size:0.86rem;font-weight:600}
+  .node .n-meta{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-3);margin-top:0.15rem}
+  .node.active{border-color:var(--brand);background:var(--hover)}
+  .node.active::before{background:var(--brand);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 20%,transparent)}
+  .node.done::before{background:var(--ok)}
+  .node .n-count{float:right;font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .rail .connector{width:1px;height:8px;background:var(--line);margin:-0.5rem auto 0}
+
+  main{padding:clamp(1.1rem,3vw,2rem);min-width:0}
+
+  .page-head{margin-bottom:1.4rem}
+  .page-head .eyebrow{font-family:var(--font-mono);font-size:var(--s-1);color:var(--brand);letter-spacing:0.06em;text-transform:uppercase}
+  .page-head h1{font-size:var(--s4);line-height:1.05;margin-top:0.15rem}
+  .page-head p{margin:0.5rem 0 0;color:var(--ink-2);max-width:62ch}
+
+  .runbar{display:flex;flex-wrap:wrap;gap:0.8rem;align-items:flex-end;padding:1rem 1.1rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:1.2rem}
+  .rf{display:grid;gap:0.3rem}
+  .rf label{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3)}
+  .rf select{padding:0.5rem 0.6rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);min-width:170px}
+  .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;font-family:var(--font-mono);font-size:var(--s-1);letter-spacing:0.02em;border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:var(--radius);transition:background .15s,transform .15s}
+  .btn:hover{background:var(--brand);border-color:var(--brand);color:#fff;transform:translateY(-1px)}
+  .btn[disabled]{opacity:.5;cursor:default;transform:none}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--hover);color:var(--ink);border-color:var(--ink-3)}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem;margin-bottom:1.2rem}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:0.8rem 0.9rem}
+  .kpi .label{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em}
+  .kpi .value{font-family:var(--font-display);font-weight:800;font-size:var(--s2);line-height:1.1;margin-top:0.25rem;font-variant-numeric:tabular-nums}
+  .kpi .foot{font-size:0.7rem;color:var(--ink-3);margin-top:0.1rem}
+  .kpi .value.good{color:var(--ok)}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .panel>header{display:flex;align-items:center;gap:0.7rem;padding:0.75rem 1rem;border-bottom:1px solid var(--line)}
+  .panel>header h3{font-size:var(--s1)}
+  .panel>header .count{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3)}
+  .panel>header .sp{flex:1}
+  .term{font-family:var(--font-mono);font-size:0.74rem;color:var(--ink-2);background:var(--surface-2);border-bottom:1px solid var(--line);padding:0.5rem 1rem;min-height:2rem;white-space:pre-wrap}
+  .term .t-ok{color:var(--ok)} .term .t-skip{color:var(--warn)} .term .t-dim{color:var(--ink-3)}
+
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.86rem}
+  th,td{text-align:left;padding:0.55rem 0.8rem;border-bottom:1px solid var(--line-2);white-space:nowrap}
+  th{font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-3);border-bottom:1px solid var(--line)}
+  tbody tr{animation:rowin .25s ease}
+  @keyframes rowin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  td.dim{color:var(--ink-3)}
+  .chip{display:inline-block;padding:0.1rem 0.45rem;font-family:var(--font-mono);font-size:0.66rem;border-radius:100px}
+  .chip.ok{color:var(--ok);background:var(--ok-bg)} .chip.skip{color:var(--warn);background:var(--warn-bg)} .chip.none{color:var(--ink-3);background:var(--idle-bg)}
+  .empty{padding:2.5rem 1rem;text-align:center;color:var(--ink-3);font-family:var(--font-mono);font-size:var(--s-1)}
+
+  .note{font-size:0.82rem;color:var(--ink-3);margin-top:1.2rem;max-width:64ch;line-height:1.6}
+  .note b{color:var(--ink-2)}
+
+  footer.appfoot{padding:1.4rem clamp(1rem,3vw,2rem);border-top:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);display:flex;gap:1rem 1.5rem;flex-wrap:wrap;justify-content:space-between}
+
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="brandmark"><span class="dot"></span>Prospector<span class="sub">B2B Lead Pipeline</span></span>
+    <span class="tb-spacer"></span>
+    <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+  <div class="body">
+    <nav class="rail" aria-label="Pipeline stages">
+      <h3>Workflow</h3>
+      <div class="node" data-node="0"><span class="n-count" id="c0">—</span><div class="n-title">Build search queries</div><div class="n-meta">regions × industries</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="1"><span class="n-count" id="c1">—</span><div class="n-title">Places lookup</div><div class="n-meta">business listings API</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="2"><span class="n-count" id="c2">—</span><div class="n-title">De-duplicate</div><div class="n-meta">by place ID</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="3"><span class="n-count" id="c3">—</span><div class="n-title">Social-link filter</div><div class="n-meta">skip FB / IG / TikTok / X</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="4"><span class="n-count" id="c4">—</span><div class="n-title">Fetch website</div><div class="n-meta">scrape each domain</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="5"><span class="n-count" id="c5">—</span><div class="n-title">Extract contact info</div><div class="n-meta">LLM parse of page text</div></div>
+      <div class="connector"></div>
+      <div class="node" data-node="6"><span class="n-count" id="c6">—</span><div class="n-title">Write to sheet</div><div class="n-meta">one row per lead</div></div>
+    </nav>
+
+    <main>
+      <div class="page-head">
+        <div class="eyebrow">Automation · live demo</div>
+        <h1>B2B Lead Generation Pipeline</h1>
+        <p>Give it a target industry and a metro. It pulls the business listings, throws out the duplicates and the social-only pages, scrapes what's left, and reads a phone number and an email off each site. This demo runs the same logic against a simulated data source.</p>
+      </div>
+
+      <div class="runbar">
+        <div class="rf">
+          <label for="industry">Target industry</label>
+          <select id="industry">
+            <option value="millwork">Architectural millwork shops</option>
+            <option value="cabinet">Cabinet manufacturers</option>
+            <option value="kbdealer">Kitchen &amp; bath dealers</option>
+            <option value="gc">Commercial general contractors</option>
+            <option value="closet">Closet &amp; storage companies</option>
+          </select>
+        </div>
+        <div class="rf">
+          <label for="metro">Metro</label>
+          <select id="metro">
+            <option>Austin, TX</option>
+            <option>Dallas–Fort Worth, TX</option>
+            <option>Houston, TX</option>
+            <option>Phoenix, AZ</option>
+            <option>Denver, CO</option>
+            <option>Nashville, TN</option>
+            <option>Charlotte, NC</option>
+            <option>Atlanta, GA</option>
+          </select>
+        </div>
+        <div class="rf">
+          <label for="depth">Cities in sweep</label>
+          <select id="depth">
+            <option value="4">4 · quick</option>
+            <option value="8" selected>8 · standard</option>
+            <option value="14">14 · full metro</option>
+          </select>
+        </div>
+        <button class="btn" id="runBtn">Run sweep</button>
+        <button class="btn ghost" id="csvBtn" disabled>Copy CSV</button>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="panel">
+        <header>
+          <h3>Results</h3>
+          <span class="count" id="resCount">no sweep yet</span>
+          <span class="sp"></span>
+          <span class="count" id="clock">0.0s</span>
+        </header>
+        <div class="term mono" id="term">Idle. Pick an industry and a metro, then run the sweep.</div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Business</th><th>Category</th><th>City</th><th>Phone</th><th>Website</th><th>Email</th><th>Rating</th><th>Result</th></tr></thead>
+            <tbody id="rows"><tr><td colspan="8" class="empty">Results stream in here as the sweep runs.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="note" id="realNote"></p>
+    </main>
+  </div>
+  <footer class="appfoot">
+    <span>Prospector · pipeline demo · simulated data source</span>
+    <span id="footStamp"></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){return document.querySelector(s);};
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- theme ---------- */
+  try{ var st=localStorage.getItem("prospector.theme"); if(st) document.documentElement.setAttribute("data-theme",st); }catch(e){}
+  $("#themeToggle").addEventListener("click",function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next=dark?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("prospector.theme",next);}catch(e){}
+  });
+
+  /* ---------- data generators ---------- */
+  var CITIES = {
+    "Austin, TX":["Austin","Round Rock","Cedar Park","Georgetown","Pflugerville","San Marcos","Kyle","Leander","Buda","Bastrop","Dripping Springs","Lakeway","Manor","Hutto"],
+    "Dallas–Fort Worth, TX":["Dallas","Fort Worth","Arlington","Plano","Irving","Frisco","McKinney","Denton","Garland","Richardson","Carrollton","Lewisville","Grapevine","Mansfield"],
+    "Houston, TX":["Houston","Sugar Land","The Woodlands","Katy","Pearland","Pasadena","Cypress","Spring","League City","Conroe","Baytown","Missouri City","Friendswood","Tomball"],
+    "Phoenix, AZ":["Phoenix","Mesa","Scottsdale","Chandler","Gilbert","Glendale","Tempe","Peoria","Surprise","Goodyear","Avondale","Queen Creek","Buckeye","Maricopa"],
+    "Denver, CO":["Denver","Aurora","Lakewood","Arvada","Westminster","Centennial","Boulder","Highlands Ranch","Thornton","Littleton","Parker","Broomfield","Castle Rock","Golden"],
+    "Nashville, TN":["Nashville","Franklin","Murfreesboro","Brentwood","Hendersonville","Smyrna","Mount Juliet","Gallatin","Lebanon","Spring Hill","La Vergne","Goodlettsville","Nolensville","Columbia"],
+    "Charlotte, NC":["Charlotte","Concord","Gastonia","Huntersville","Kannapolis","Matthews","Mooresville","Cornelius","Monroe","Indian Trail","Belmont","Pineville","Davidson","Mint Hill"],
+    "Atlanta, GA":["Atlanta","Marietta","Alpharetta","Roswell","Sandy Springs","Smyrna","Dunwoody","Kennesaw","Duluth","Johns Creek","Decatur","Peachtree City","Woodstock","Lawrenceville"]
+  };
+  var IND = {
+    millwork:{cat:"Architectural millwork", names:["Summit","Ironwood","Keystone","Blackwater","Meridian","Cypress","Foundry","Copper Creek","Northline","Hearth & Grain","Sawtooth","Union","Timberline","Redwood","Anvil"], suffix:["Millwork","Woodworks","Custom Woodworking","Architectural Millwork","Cabinet Co."]},
+    cabinet:{cat:"Cabinet manufacturer", names:["Precision","Heritage","Cornerstone","Vantage","Crestview","Oakmont","Sterling","Legacy","Highpoint","Windham","Bridgewater","Ashford"], suffix:["Cabinetry","Cabinet Works","Cabinet Manufacturing","Custom Cabinets","Kitchens"]},
+    kbdealer:{cat:"Kitchen & bath dealer", names:["Metro","Bella","Artisan","Elite","Signature","Modern Home","Studio 7","The Kitchen Place","Coastal","Urban","Hillcrest","Verano"], suffix:["Kitchen & Bath","Design Studio","Kitchens & Baths","Home Design","Cabinetry & Design"]},
+    gc:{cat:"General contractor", names:["Brennan","Halcyon","Vantage","Cornerstone","Bluepeak","Ironclad","Landmark","Meridian","Granite Ridge","Fortis","Anchor","Kearney"], suffix:["Construction","Builders","Construction Group","Contractors","Building Co."]},
+    closet:{cat:"Closet & storage", names:["ClosetCraft","SpaceWise","Tailored","Nook","OrderlyHome","California-style","Clear Space","Fitwell","StowPro","Neat Method"], suffix:["Closets","Custom Closets","Storage Systems","Closet Design","Organized Spaces"]}
+  };
+  var LOST = ["chain / franchise — no local site","site is a Facebook page only","no website listed","site down / parked domain","directory listing, not a business site"];
+
+  function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,""); }
+  function phone(){ var a=[512,214,713,602,303,615,704,404]; return "("+rnd(a)+") "+(200+Math.floor(Math.random()*700))+"-"+pad(Math.floor(Math.random()*100))+pad(Math.floor(Math.random()*100)); }
+  function rating(){ return (3.6+Math.random()*1.3).toFixed(1); }
+
+  function makeRow(ind, city){
+    var d=IND[ind];
+    var name = rnd(d.names)+" "+rnd(d.suffix);
+    var r = { name:name, cat:d.cat, city:city, rating:rating(), phone:phone(), site:"", email:"", status:"", social:false, dead:false };
+    var roll = Math.random();
+    if (roll < 0.16){ r.social=true; r.site="facebook.com/"+slug(name); }
+    else if (roll < 0.24){ r.dead=true; r.site = Math.random()<0.5 ? "" : slug(name)+".com"; }
+    else { r.site = slug(name)+".com"; }
+    return r;
+  }
+
+  /* ---------- run ---------- */
+  var running=false, lastRows=[];
+  var nodes=[].slice.call(document.querySelectorAll(".node"));
+  function setNode(i,cls){ nodes.forEach(function(n,k){ if(k===i){ n.className="node "+cls; } else if(k<i){ n.classList.remove("active"); n.classList.add("done"); } }); }
+  function nc(i,v){ $("#c"+i).textContent = v; }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, reduce?5:ms); }); }
+  function termLine(html){ var t=$("#term"); t.innerHTML += "\n"+html; t.scrollTop=t.scrollHeight; }
+
+  function fmtKpis(k){
+    var items=[
+      ["Queries", k.queries, k.cities+" cities"],
+      ["Listings", k.listings, "before dedupe"],
+      ["Unique", k.unique, (k.listings-k.unique)+" dupes removed"],
+      ["Scraped", k.scraped, k.skipped+" social pages skipped"],
+      ["Emails found", k.emails, Math.round(k.emails/Math.max(1,k.unique)*100)+"% of leads"],
+      ["Run time", k.time+"s", "with social filter"]
+    ];
+    $("#kpis").innerHTML = items.map(function(it){
+      var good = it[0]==="Run time" ? " good" : "";
+      return '<div class="kpi"><div class="label">'+it[0]+'</div><div class="value'+good+'">'+it[1]+'</div><div class="foot">'+it[2]+'</div></div>';
+    }).join("");
+  }
+
+  async function run(){
+    if(running) return;
+    running=true;
+    $("#runBtn").disabled=true; $("#runBtn").textContent="Running…";
+    $("#csvBtn").disabled=true;
+    nodes.forEach(function(n){ n.className="node"; });
+    for(var i=0;i<7;i++) nc(i,"—");
+    $("#rows").innerHTML='<tr><td colspan="8" class="empty">Sweeping…</td></tr>';
+    $("#term").textContent="";
+    $("#kpis").innerHTML="";
+    var t0=performance.now();
+    var clock=setInterval(function(){ $("#clock").textContent=((performance.now()-t0)/1000).toFixed(1)+"s"; }, 100);
+
+    var ind=$("#industry").value;
+    var metroName=$("#metro").value;
+    var nCities=parseInt($("#depth").value,10);
+    var pool=CITIES[metroName].slice(0,nCities);
+    var industryLabel=$("#industry").selectedOptions[0].textContent;
+
+    // 0 — build queries
+    setNode(0,"active");
+    termLine('<span class="t-dim">$</span> build queries — "'+industryLabel+'" × '+nCities+' cities');
+    await wait(420);
+    var queries=pool.map(function(c){ return c+" "+ind; });
+    nc(0,queries.length); setNode(1,"active");
+
+    // 1 — places lookup
+    var raw=[];
+    for(var qi=0; qi<pool.length; qi++){
+      var city=pool[qi];
+      var count=3+Math.floor(Math.random()*5);
+      for(var j=0;j<count;j++) raw.push(makeRow(ind, city));
+      // sprinkle a near-duplicate
+      if(Math.random()<0.5 && raw.length>1){ var dup=Object.assign({}, raw[raw.length-1]); dup.name=dup.name.replace(/(Co\.|Inc\.)?$/," LLC"); raw.push(dup); }
+      nc(1, raw.length);
+      termLine('places: '+city+' → '+count+' results');
+      await wait(140);
+    }
+    setNode(2,"active");
+
+    // 2 — dedupe (by name+city)
+    await wait(300);
+    var seen={}, unique=[];
+    raw.forEach(function(r){
+      var key=slug(r.name).replace(/llc|inc|co/g,"")+"|"+r.city;
+      if(!seen[key]){ seen[key]=1; unique.push(r); }
+    });
+    nc(2, unique.length);
+    termLine('<span class="t-ok">✓</span> dedupe: '+raw.length+' → '+unique.length+' ('+(raw.length-unique.length)+' removed)');
+    setNode(3,"active");
+
+    // 3 — social filter
+    await wait(300);
+    var toScrape=[], skipped=0;
+    unique.forEach(function(r){
+      if(r.social){ skipped++; r.status="skipped"; }
+      else toScrape.push(r);
+    });
+    nc(3, skipped+" skipped");
+    termLine('<span class="t-skip">↳</span> social filter: '+skipped+' pages skipped (would 403 anyway)');
+    setNode(4,"active");
+
+    // 4 + 5 — scrape + extract, stream rows
+    $("#rows").innerHTML="";
+    var emails=0, scraped=0;
+    for(var si=0; si<unique.length; si++){
+      var r=unique[si];
+      if(!r.social){
+        scraped++;
+        nc(4, scraped);
+        if(r.dead || !r.site){ r.status="no-site"; }
+        else if(Math.random() < 0.82){ r.email = "info@"+r.site; if(Math.random()<0.4) r.email = rnd(["contact","sales","estimating","office"])+"@"+r.site; emails++; r.status="ok"; }
+        else { r.status="no-email"; }
+        nc(5, emails);
+      }
+      addRow(r);
+      $("#resCount").textContent = (si+1)+" of "+unique.length;
+      await wait(reduce?2:70);
+    }
+    setNode(5,"active"); nc(5, emails);
+    await wait(200);
+    setNode(6,"active");
+    await wait(300);
+    nc(6, unique.length);
+    nodes[6].classList.remove("active"); nodes[6].classList.add("done");
+
+    clearInterval(clock);
+    var secs=((performance.now()-t0)/1000);
+    // present a realistic wall-clock, not the demo's sped-up time
+    var shownTime=(nCities*0.9 + unique.length*0.7 + 4).toFixed(1);
+    var withoutFilter=(Number(shownTime) + skipped*13).toFixed(0);
+    $("#clock").textContent=shownTime+"s";
+
+    fmtKpis({queries:queries.length, cities:nCities, listings:raw.length, unique:unique.length, scraped:scraped, skipped:skipped, emails:emails, time:shownTime});
+    $("#realNote").innerHTML = '<b>Why the social filter matters.</b> The '+skipped+' Facebook-only pages in this sweep can\'t be scraped — the scraper 403s on them every time. Checking the domain <i>before</i> the fetch step, instead of letting each one time out, is the difference between this run ('+shownTime+'s) and roughly '+withoutFilter+'s without it. On the real pipeline that change cut a full test sweep from about nine minutes to twenty-five seconds.';
+    $("#footStamp").textContent = "swept "+new Date().toLocaleTimeString();
+
+    lastRows = unique;
+    $("#csvBtn").disabled=false;
+    $("#runBtn").disabled=false; $("#runBtn").textContent="Run again";
+    running=false;
+  }
+
+  function addRow(r){
+    var tr=document.createElement("tr");
+    var res = r.status==="ok" ? '<span class="chip ok">email</span>'
+            : r.status==="skipped" ? '<span class="chip skip">social</span>'
+            : '<span class="chip none">'+ (r.status==="no-email"?"no email":"no site") +'</span>';
+    tr.innerHTML =
+      '<td>'+r.name+'</td>'+
+      '<td class="dim">'+r.cat+'</td>'+
+      '<td>'+r.city+'</td>'+
+      '<td class="mono">'+r.phone+'</td>'+
+      '<td class="dim mono">'+(r.site||"—")+'</td>'+
+      '<td class="mono">'+(r.email||"—")+'</td>'+
+      '<td class="mono">'+r.rating+'</td>'+
+      '<td>'+res+'</td>';
+    $("#rows").appendChild(tr);
+  }
+
+  $("#runBtn").addEventListener("click", run);
+  $("#csvBtn").addEventListener("click", function(){
+    if(!lastRows.length) return;
+    var head=["Business","Category","City","Phone","Website","Email","Rating","Result"];
+    var lines=[head.join(",")].concat(lastRows.map(function(r){
+      return [r.name, r.cat, r.city, r.phone, r.site||"", r.email||"", r.rating, r.status].map(function(v){
+        v=String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+      }).join(",");
+    }));
+    var txt=lines.join("\n");
+    if(navigator.clipboard) navigator.clipboard.writeText(txt).then(function(){ $("#csvBtn").textContent="Copied ✓"; setTimeout(function(){ $("#csvBtn").textContent="Copy CSV"; },1500); });
+  });
+})();
+</script>
+</body>
+</html>

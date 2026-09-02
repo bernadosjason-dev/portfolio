@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lead Pipeline Tracker</title>
+<meta name="description" content="Track every lead from first inquiry to awarded job — stage board, win rate by product line, source and buyer type, and the funnel drop-off in between. Sample data included." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  :root{
+    --paper:#F3F4F1; --surface:#FFFFFF; --surface-2:#ECEEE9; --hover:#E7E9E3;
+    --ink:#1B1E1B; --ink-2:#45493F; --ink-3:#6A6E63;
+    --line:#D3D5CC; --line-2:#E1E2DB;
+    --brand:#C43D2B; --brand-ink:#FFFFFF;
+    --ok:#2F7D4F; --ok-bg:#E4F0E7; --warn:#A9701A; --warn-bg:#F6ECD9;
+    --bad:#C0392B; --bad-bg:#F5E1DE; --idle:#6A6E63; --idle-bg:#E7E8E2;
+    --focus:#C43D2B;
+    --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --font-body:"Hanken Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --s-1:0.78rem; --s0:0.94rem; --s1:1.1rem; --s2:1.35rem; --s3:1.7rem; --s4:2.2rem;
+    --radius:3px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+      --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+      --brand:#E4573F; --brand-ink:#17140F;
+      --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+      --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131517; --surface:#1A1D1F; --surface-2:#202427; --hover:#262A2D;
+    --ink:#E9E8E1; --ink-2:#B7B9B2; --ink-3:#868B81; --line:#313539; --line-2:#24282B;
+    --brand:#E4573F; --brand-ink:#17140F;
+    --ok:#5FB07E; --ok-bg:#1C2A22; --warn:#D6A653; --warn-bg:#2A2418;
+    --bad:#E06B5E; --bad-bg:#2C1E1C; --idle:#868B81; --idle-bg:#23262A; --focus:#E4573F;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:var(--font-body);font-size:var(--s0);line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:-0.01em;margin:0}
+  button{font:inherit;cursor:pointer}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  input,select,textarea{font:inherit;color:inherit}
+  .mono{font-family:var(--font-mono)} .muted{color:var(--ink-3)}
+  .app{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+  .topbar{display:flex;align-items:center;gap:1rem;padding:0 clamp(1rem,3vw,2rem);height:60px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .brandmark{display:flex;align-items:baseline;gap:0.55rem;font-family:var(--font-display);font-weight:800;font-size:var(--s2);letter-spacing:-0.02em}
+  .brandmark .dot{width:9px;height:9px;background:var(--brand);display:inline-block;transform:translateY(-1px)}
+  .brandmark .sub{font-family:var(--font-mono);font-weight:400;font-size:var(--s-1);color:var(--ink-3)}
+  .tb-spacer{margin-left:auto}
+  .iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:var(--radius)}
+  .iconbtn:hover{background:var(--hover);color:var(--ink)}
+  main{padding:clamp(1.1rem,3vw,2rem);min-width:0}
+
+  .page-head{display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem}
+  .page-head .eyebrow{font-family:var(--font-mono);font-size:var(--s-1);color:var(--brand);letter-spacing:0.06em;text-transform:uppercase}
+  .page-head h1{font-size:var(--s4);line-height:1.05}
+  .page-head .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.95rem;font-family:var(--font-mono);font-size:var(--s-1);letter-spacing:0.02em;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:var(--radius);transition:background .15s,color .15s}
+  .btn:hover{background:var(--hover)}
+  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.primary:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.sm{padding:0.3rem 0.55rem}
+  .btn.ghost{border-color:var(--line)}
+
+  .tabs{display:flex;gap:0.2rem;border-bottom:1px solid var(--line);margin-bottom:1.4rem}
+  .tabs button{padding:0.6rem 0.9rem;background:transparent;border:0;font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);border-bottom:2px solid transparent}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:1.4rem}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:0.85rem 1rem}
+  .kpi .label{font-family:var(--font-mono);font-size:0.68rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em}
+  .kpi .value{font-family:var(--font-display);font-weight:800;font-size:var(--s3);line-height:1.1;margin-top:0.25rem;font-variant-numeric:tabular-nums}
+  .kpi .foot{font-size:0.7rem;color:var(--ink-3);margin-top:0.1rem}
+
+  /* board */
+  .board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:0.7rem;overflow-x:auto;padding-bottom:0.5rem}
+  .col{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);min-height:120px;display:flex;flex-direction:column}
+  .col>header{padding:0.6rem 0.7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:0.4rem}
+  .col>header .t{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em}
+  .col>header .n{margin-left:auto;font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-3)}
+  .col .cards{padding:0.55rem;display:grid;gap:0.5rem;align-content:start}
+  .col.won>header{color:var(--ok)} .col.lost>header{color:var(--bad)}
+  .lead{border:1px solid var(--line);border-radius:var(--radius);padding:0.55rem 0.65rem;background:var(--surface);cursor:pointer;transition:border-color .12s,transform .12s}
+  .lead:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+  .lead .lname{font-weight:600;font-size:0.86rem;line-height:1.2}
+  .lead .lmeta{font-family:var(--font-mono);font-size:0.66rem;color:var(--ink-3);margin-top:0.2rem}
+  .lead .lval{font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-2);margin-top:0.25rem;font-variant-numeric:tabular-nums}
+  .lead .plines{margin-top:0.3rem;display:flex;flex-wrap:wrap;gap:0.2rem}
+  .pl{font-family:var(--font-mono);font-size:0.6rem;padding:0.05rem 0.35rem;border-radius:100px;background:var(--surface-2);color:var(--ink-3)}
+
+  /* funnel + tables */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:1.1rem}
+  .panel>header{padding:0.75rem 1rem;border-bottom:1px solid var(--line);display:flex;gap:0.7rem;align-items:center}
+  .panel>header h3{font-size:var(--s1)}
+  .panel .pad{padding:1.1rem}
+  .funnel{display:grid;gap:0.55rem}
+  .frow{display:grid;grid-template-columns:150px 1fr 74px;gap:0.7rem;align-items:center;font-size:0.84rem}
+  .fbar{height:22px;background:var(--surface-2);border-radius:var(--radius);position:relative;overflow:hidden}
+  .fbar>span{position:absolute;inset:0;width:var(--w);background:var(--brand);opacity:0.85}
+  .frow .fn{font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+  .frow.drop .fn{color:var(--bad)}
+
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.86rem}
+  th,td{text-align:left;padding:0.55rem 0.8rem;border-bottom:1px solid var(--line-2);white-space:nowrap}
+  th{font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-3);border-bottom:1px solid var(--line)}
+  td.num{font-variant-numeric:tabular-nums}
+  .wr{display:inline-block;min-width:44px;font-variant-numeric:tabular-nums}
+
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(20,22,20,0.55);display:grid;place-items:center;padding:1rem;z-index:60}
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);width:min(560px,100%);max-height:90vh;overflow-y:auto}
+  .modal header{padding:1rem 1.2rem;border-bottom:1px solid var(--line);display:flex;align-items:center}
+  .modal header h3{font-size:var(--s1)}
+  .modal header button{margin-left:auto;background:transparent;border:0;font-size:1.3rem;color:var(--ink-3);line-height:1}
+  .modal form{padding:1.2rem;display:grid;gap:0.9rem}
+  .field{display:grid;gap:0.3rem}
+  .field label{font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-2)}
+  .field input,.field select,.field textarea{padding:0.5rem 0.6rem;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);width:100%}
+  .field textarea{min-height:60px;resize:vertical}
+  .field.row2{grid-template-columns:1fr 1fr;gap:0.9rem}
+  @media (max-width:520px){.field.row2{grid-template-columns:1fr}}
+  .plgrid{display:flex;flex-wrap:wrap;gap:0.4rem}
+  .plgrid label{display:inline-flex;align-items:center;gap:0.3rem;font-family:var(--font-mono);font-size:0.72rem;padding:0.25rem 0.5rem;border:1px solid var(--line);border-radius:100px;cursor:pointer}
+  .plgrid input{width:auto}
+  .modal .actions{display:flex;gap:0.6rem;justify-content:space-between;padding-top:0.3rem}
+  .empty{text-align:center;color:var(--ink-3);padding:2.2rem 1rem;font-family:var(--font-mono);font-size:var(--s-1)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:0.6rem 1rem;font-family:var(--font-mono);font-size:var(--s-1);border-radius:var(--radius);opacity:0;transition:opacity .2s,transform .2s;z-index:80;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer.appfoot{padding:1.4rem clamp(1rem,3vw,2rem);border-top:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);display:flex;gap:1rem 1.5rem;flex-wrap:wrap;justify-content:space-between}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <span class="brandmark"><span class="dot"></span>Funnel<span class="sub">Lead Pipeline Tracker</span></span>
+    <span class="tb-spacer"></span>
+    <button class="iconbtn" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+    <button class="iconbtn" id="dataBtn" title="Data &amp; backup" aria-label="Data and backup">⋯</button>
+  </div>
+  <main id="app"></main>
+  <footer class="appfoot">
+    <span>Funnel · lead pipeline tracker · data stored in this browser</span>
+    <span id="footStamp"></span>
+  </footer>
+</div>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  var uid=function(){return Math.random().toString(36).slice(2,9);};
+  function todayISO(){return new Date().toISOString().slice(0,10);}
+  function dISO(off){var d=new Date();d.setDate(d.getDate()+off);return d.toISOString().slice(0,10);}
+  function parseD(s){return s?new Date(s+"T00:00:00"):null;}
+  function daysBetween(a,b){if(!a||!b)return null;return Math.round((parseD(b)-parseD(a))/86400000);}
+  function fmtDate(s){if(!s)return "—";return parseD(s).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
+  function fmtUSD(n){n=Number(n)||0;return "$"+n.toLocaleString("en-US");}
+  function fmtK(n){n=Number(n)||0;if(n>=1e6)return "$"+(n/1e6).toFixed(2)+"M";if(n>=1e3)return "$"+Math.round(n/1e3)+"K";return "$"+n;}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("show");},2000);}
+
+  var STAGES=["Inquiry","Site visit set","Site visit done","Quote issued","Deposit paid","Awarded"];
+  var STAGE_DATE={"Inquiry":"dInquiry","Site visit set":"dVisitSet","Site visit done":"dVisitDone","Quote issued":"dQuote","Deposit paid":"dDeposit","Awarded":"dAwarded"};
+  var SOURCES=["Referral","Website","Trade show","Cold outreach","Repeat client","Online estimator"];
+  var BUYERS=["General contractor","Designer / architect","Developer","Direct homeowner"];
+  var PLINES=["Kitchen","Closet","Restroom partition","Vanity","Media wall","Office casework","Bar unit"];
+  var LOST_REASONS=["Price","Lost to competitor","Scope changed / cancelled","Timeline","No decision / went quiet"];
+
+  /* ---------- seed ---------- */
+  function seed(){
+    function L(o){return Object.assign({id:uid(),plines:[],lostReason:"",notes:"",quote:0,deposit:0,awarded:0,
+      dInquiry:"",dVisitSet:"",dVisitDone:"",dQuote:"",dDeposit:"",dAwarded:""},o);}
+    return {company:"Meridian Millwork", leads:[
+      L({name:"Northgate Medical Plaza", contact:"Brennan Construction Group", location:"Austin, TX", source:"Referral", buyer:"General contractor", plines:["Office casework"], stage:"Awarded", quote:1240000, deposit:124000, awarded:1240000, dInquiry:dISO(-96),dVisitSet:dISO(-92),dVisitDone:dISO(-85),dQuote:dISO(-70),dDeposit:dISO(-58),dAwarded:dISO(-52)}),
+      L({name:"Riverbend Apartments Bldg C", contact:"Halcyon Residential", location:"San Marcos, TX", source:"Repeat client", buyer:"Developer", plines:["Kitchen","Vanity"], stage:"Awarded", quote:685000, deposit:68500, awarded:660000, dInquiry:dISO(-78),dVisitSet:dISO(-74),dVisitDone:dISO(-68),dQuote:dISO(-55),dDeposit:dISO(-44),dAwarded:dISO(-40)}),
+      L({name:"Cedar & Vine restaurant", contact:"Cedar Hospitality Group", location:"Round Rock, TX", source:"Trade show", buyer:"Designer / architect", plines:["Bar unit","Media wall"], stage:"Deposit paid", quote:312000, deposit:31200, dInquiry:dISO(-40),dVisitSet:dISO(-36),dVisitDone:dISO(-30),dQuote:dISO(-18),dDeposit:dISO(-6)}),
+      L({name:"Lakeline Corporate Center TI", contact:"Vantage Builders", location:"Cedar Park, TX", source:"Website", buyer:"General contractor", plines:["Office casework"], stage:"Quote issued", quote:940000, dInquiry:dISO(-30),dVisitSet:dISO(-26),dVisitDone:dISO(-19),dQuote:dISO(-4)}),
+      L({name:"Hillside kitchen remodel", contact:"D. & M. Okafor", location:"Georgetown, TX", source:"Online estimator", buyer:"Direct homeowner", plines:["Kitchen"], stage:"Quote issued", quote:58000, dInquiry:dISO(-22),dVisitSet:dISO(-18),dVisitDone:dISO(-12),dQuote:dISO(-3)}),
+      L({name:"Sterling Heights model units", contact:"Sterling Homes", location:"Pflugerville, TX", source:"Cold outreach", buyer:"Developer", plines:["Kitchen","Closet","Vanity"], stage:"Site visit done", quote:0, dInquiry:dISO(-16),dVisitSet:dISO(-12),dVisitDone:dISO(-5)}),
+      L({name:"Dr. Alvarez dental office", contact:"Alvarez Family Dental", location:"Kyle, TX", source:"Referral", buyer:"Direct homeowner", plines:["Office casework","Restroom partition"], stage:"Site visit set", quote:0, dInquiry:dISO(-9),dVisitSet:dISO(-3)}),
+      L({name:"Brookfield townhomes ph.2", contact:"Brookfield Development", location:"Leander, TX", source:"Repeat client", buyer:"Developer", plines:["Kitchen","Vanity","Closet"], stage:"Inquiry", quote:0, dInquiry:dISO(-4)}),
+      L({name:"The Grove clubhouse", contact:"Grove HOA", location:"Buda, TX", source:"Website", buyer:"Designer / architect", plines:["Bar unit","Media wall"], stage:"Inquiry", quote:0, dInquiry:dISO(-2)}),
+      L({name:"Maple St. custom home", contact:"J. Whitfield, architect", location:"Dripping Springs, TX", source:"Referral", buyer:"Designer / architect", plines:["Kitchen","Closet","Media wall"], stage:"Lost", quote:186000, lostReason:"Lost to competitor", dInquiry:dISO(-64),dVisitSet:dISO(-60),dVisitDone:dISO(-54),dQuote:dISO(-42)}),
+      L({name:"Parkview office fit-out", contact:"Parkview Partners", location:"Manor, TX", source:"Cold outreach", buyer:"General contractor", plines:["Office casework"], stage:"Lost", quote:410000, lostReason:"Price", dInquiry:dISO(-58),dVisitSet:dISO(-53),dVisitDone:dISO(-47),dQuote:dISO(-33)}),
+      L({name:"Willow Creek amenity center", contact:"Willow Creek Devco", location:"Hutto, TX", source:"Trade show", buyer:"Developer", plines:["Kitchen","Bar unit"], stage:"Lost", quote:0, lostReason:"No decision / went quiet", dInquiry:dISO(-50),dVisitSet:dISO(-45),dVisitDone:dISO(-38)})
+    ], savedAt:new Date().toISOString()};
+  }
+
+  /* ---------- store ---------- */
+  var KEY="funnel.v1";
+  var state=load();
+  function load(){try{var r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}var s=seed();persist(s);return s;}
+  function persist(s){s=s||state;s.savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}var f=$("#footStamp");if(f)f.textContent="saved "+new Date(s.savedAt).toLocaleString("en-US");}
+  function save(){persist(state);}
+  function leads(){return state.leads||(state.leads=[]);}
+  function byId(id){return leads().filter(function(l){return l.id===id;})[0];}
+
+  /* ---------- computed ---------- */
+  function stageIndex(l){ if(l.stage==="Lost")return -1; return STAGES.indexOf(l.stage); }
+  function reached(l,stage){
+    if(l.stage==="Lost"){
+      // a lost lead reached whatever stages it had dates for
+      return !!l[STAGE_DATE[stage]] || (l.lostFrom && STAGES.indexOf(stage)<=STAGES.indexOf(l.lostFrom));
+    }
+    return STAGES.indexOf(stage) <= stageIndex(l);
+  }
+  function isWon(l){return l.stage==="Awarded";}
+  function isClosed(l){return l.stage==="Awarded"||l.stage==="Lost";}
+
+  function funnel(){
+    var all=leads();
+    return STAGES.map(function(s,i){
+      var n=all.filter(function(l){return reached(l,s);}).length;
+      return {stage:s, n:n};
+    });
+  }
+  function winRateBy(key){
+    var groups={};
+    leads().forEach(function(l){
+      var vals = key==="pline" ? (l.plines.length?l.plines:["(none)"]) : [l[key]||"(unset)"];
+      vals.forEach(function(v){
+        groups[v]=groups[v]||{closed:0,won:0,pipeline:0,awarded:0};
+        if(isClosed(l)){ groups[v].closed++; if(isWon(l)) groups[v].won++; }
+        if(!isClosed(l)) groups[v].pipeline += Number(l.quote)||0;
+        if(isWon(l)) groups[v].awarded += Number(l.awarded)||0;
+      });
+    });
+    return Object.keys(groups).sort().map(function(k){
+      var g=groups[k];
+      return {label:k, closed:g.closed, won:g.won, rate:g.closed?Math.round(g.won/g.closed*100):null, pipeline:g.pipeline, awarded:g.awarded};
+    });
+  }
+  function avgDays(fromKey,toKey){
+    var xs=leads().map(function(l){return daysBetween(l[fromKey],l[toKey]);}).filter(function(d){return d!=null&&d>=0;});
+    if(!xs.length)return null;
+    return Math.round(xs.reduce(function(a,b){return a+b;},0)/xs.length);
+  }
+
+  /* ---------- render ---------- */
+  var ui={tab:"board"};
+  function render(){
+    var el=$("#app");
+    var all=leads();
+    var closed=all.filter(isClosed);
+    var won=all.filter(isWon);
+    var openLeads=all.filter(function(l){return !isClosed(l);});
+    var pipeline=openLeads.reduce(function(a,l){return a+(Number(l.quote)||0);},0);
+    var awarded=won.reduce(function(a,l){return a+(Number(l.awarded)||0);},0);
+    var winRate=closed.length?Math.round(won.length/closed.length*100):0;
+
+    var head='<div class="page-head">'+
+      '<div><div class="eyebrow">Sales · live demo</div><h1>Lead Pipeline Tracker</h1></div>'+
+      '<div class="sp"></div>'+
+      '<button class="btn primary" onclick="addLead()">+ New lead</button></div>';
+
+    var kpis='<div class="kpis">'+
+      kpi("Open leads",openLeads.length,all.length+" total")+
+      kpi("Pipeline value",fmtK(pipeline),"quoted, still open")+
+      kpi("Win rate",winRate+"%",won.length+" of "+closed.length+" closed")+
+      kpi("Awarded revenue",fmtK(awarded),won.length+" jobs won")+
+      kpi("Inquiry → quote",(avgDays("dInquiry","dQuote")==null?"—":avgDays("dInquiry","dQuote")+"d"),"average")+
+      kpi("Quote → award",(avgDays("dQuote","dAwarded")==null?"—":avgDays("dQuote","dAwarded")+"d"),"average, won only")+
+    '</div>';
+
+    var tabs='<div class="tabs" role="tablist">'+
+      tab("board","Board")+tab("funnel","Funnel")+tab("analysis","Win rate")+'</div>';
+
+    var body = ui.tab==="funnel" ? viewFunnel()
+             : ui.tab==="analysis" ? viewAnalysis()
+             : viewBoard();
+
+    el.innerHTML=head+kpis+tabs+body;
+    function kpi(l,v,f){return '<div class="kpi"><div class="label">'+esc(l)+'</div><div class="value">'+esc(v)+'</div><div class="foot">'+esc(f)+'</div></div>';}
+    function tab(id,label){return '<button role="tab" aria-selected="'+(ui.tab===id)+'" onclick="setTab(\''+id+'\')">'+label+'</button>';}
+  }
+  window.setTab=function(t){ui.tab=t;render();};
+
+  function viewBoard(){
+    var cols=STAGES.concat(["Lost"]).map(function(s){
+      var ls=leads().filter(function(l){return l.stage===s;});
+      var cls = s==="Awarded"?"col won":s==="Lost"?"col lost":"col";
+      var cards=ls.length?ls.map(leadCard).join(""):'<div class="empty" style="padding:1rem">—</div>';
+      return '<div class="'+cls+'"><header><span class="t">'+esc(s)+'</span><span class="n">'+ls.length+'</span></header><div class="cards">'+cards+'</div></div>';
+    }).join("");
+    return '<div class="board">'+cols+'</div>';
+  }
+  function leadCard(l){
+    var val = l.stage==="Awarded"?fmtK(l.awarded)+" won" : l.stage==="Lost"?(l.lostReason||"lost") : l.quote?fmtK(l.quote)+" quoted":"not quoted";
+    return '<div class="lead" onclick="editLead(\''+l.id+'\')">'+
+      '<div class="lname">'+esc(l.name)+'</div>'+
+      '<div class="lmeta">'+esc(l.contact)+' · '+esc(l.location)+'</div>'+
+      '<div class="lval">'+esc(val)+'</div>'+
+      (l.plines.length?'<div class="plines">'+l.plines.map(function(p){return '<span class="pl">'+esc(p)+'</span>';}).join("")+'</div>':'')+
+    '</div>';
+  }
+
+  function viewFunnel(){
+    var f=funnel();
+    var top=f[0].n||1;
+    var rows=f.map(function(row,i){
+      var pct=Math.round(row.n/top*100);
+      var carry = i>0 ? Math.round(row.n/(f[i-1].n||1)*100) : 100;
+      var dropped = i>0 ? f[i-1].n-row.n : 0;
+      return '<div class="frow'+(dropped>0?' drop':'')+'">'+
+        '<span class="mono">'+esc(row.stage)+'</span>'+
+        '<div class="fbar" style="--w:'+pct+'%"><span></span></div>'+
+        '<span class="fn">'+row.n+(i>0?' · '+carry+'%':'')+'</span></div>';
+    }).join("");
+    var lost=leads().filter(function(l){return l.stage==="Lost";}).length;
+    return '<div class="panel"><header><h3>Funnel</h3><span class="muted mono" style="font-size:var(--s-1)">how many of each stage carried forward</span></header>'+
+      '<div class="pad"><div class="funnel">'+rows+'</div>'+
+      '<p class="muted" style="font-size:0.8rem;margin:1rem 0 0">'+lost+' leads marked lost. The percentage on each row is the share of the previous stage that advanced &mdash; the drop between two stages is where leads are leaking.</p></div></div>';
+  }
+
+  function viewAnalysis(){
+    return block("By product line", winRateBy("pline")) +
+           block("By source", winRateBy("source")) +
+           block("By buyer type", winRateBy("buyer")) +
+           block("By lost reason", lostBreakdown());
+    function block(title,rows){
+      var body=rows.length?('<div class="tablewrap"><table><thead><tr><th>'+esc(title.replace("By ",""))+'</th><th>Closed</th><th>Won</th><th>Win rate</th><th>Open pipeline</th><th>Awarded</th></tr></thead><tbody>'+
+        rows.map(function(r){
+          return '<tr><td>'+esc(r.label)+'</td><td class="num">'+r.closed+'</td><td class="num">'+r.won+'</td>'+
+            '<td class="num"><span class="wr">'+(r.rate==null?"—":r.rate+"%")+'</span></td>'+
+            '<td class="num">'+(r.pipeline?fmtK(r.pipeline):"—")+'</td>'+
+            '<td class="num">'+(r.awarded?fmtK(r.awarded):"—")+'</td></tr>';
+        }).join("")+'</tbody></table></div>') : '<div class="empty">No data yet.</div>';
+      return '<div class="panel"><header><h3>'+esc(title)+'</h3></header>'+body+'</div>';
+    }
+    function lostBreakdown(){
+      var g={};
+      leads().filter(function(l){return l.stage==="Lost";}).forEach(function(l){
+        var k=l.lostReason||"(unspecified)";
+        g[k]=g[k]||{closed:0,won:0,pipeline:0,awarded:0};
+        g[k].closed++;
+      });
+      return Object.keys(g).sort().map(function(k){return {label:k,closed:g[k].closed,won:0,rate:0,pipeline:0,awarded:0};});
+    }
+  }
+
+  /* ---------- form ---------- */
+  window.addLead=function(){ openForm(null); };
+  window.editLead=function(id){ openForm(id); };
+
+  function openForm(id){
+    var isNew=!id;
+    var l = id ? Object.assign({},byId(id)) : {id:uid(),name:"",contact:"",location:"",source:SOURCES[0],buyer:BUYERS[0],
+      plines:[],stage:"Inquiry",quote:0,deposit:0,awarded:0,lostReason:LOST_REASONS[0],notes:"",
+      dInquiry:todayISO(),dVisitSet:"",dVisitDone:"",dQuote:"",dDeposit:"",dAwarded:""};
+
+    var stageOpts=STAGES.concat(["Lost"]).map(function(s){return '<option'+(s===l.stage?" selected":"")+'>'+s+'</option>';}).join("");
+    var srcOpts=SOURCES.map(function(s){return '<option'+(s===l.source?" selected":"")+'>'+s+'</option>';}).join("");
+    var buyOpts=BUYERS.map(function(s){return '<option'+(s===l.buyer?" selected":"")+'>'+s+'</option>';}).join("");
+    var lostOpts=LOST_REASONS.map(function(s){return '<option'+(s===l.lostReason?" selected":"")+'>'+s+'</option>';}).join("");
+    var plChecks=PLINES.map(function(p){
+      return '<label><input type="checkbox" name="pl" value="'+p+'"'+(l.plines.indexOf(p)>=0?" checked":"")+'> '+p+'</label>';
+    }).join("");
+
+    var html='<div class="modal-back" id="mb"><div class="modal" role="dialog" aria-modal="true" aria-label="'+(isNew?"New lead":"Edit lead")+'">'+
+      '<header><h3>'+(isNew?"New lead":"Edit lead")+'</h3><button type="button" onclick="closeForm()" aria-label="Close">×</button></header>'+
+      '<form id="lf">'+
+        '<div class="field"><label>Project / lead name</label><input name="name" value="'+esc(l.name)+'" required></div>'+
+        '<div class="field row2"><div class="field"><label>Client / contact</label><input name="contact" value="'+esc(l.contact)+'"></div>'+
+          '<div class="field"><label>Location</label><input name="location" value="'+esc(l.location)+'"></div></div>'+
+        '<div class="field row2"><div class="field"><label>Source</label><select name="source">'+srcOpts+'</select></div>'+
+          '<div class="field"><label>Buyer type</label><select name="buyer">'+buyOpts+'</select></div></div>'+
+        '<div class="field"><label>Product lines</label><div class="plgrid">'+plChecks+'</div></div>'+
+        '<div class="field row2"><div class="field"><label>Stage</label><select name="stage" id="stageSel">'+stageOpts+'</select></div>'+
+          '<div class="field" id="lostWrap" style="'+(l.stage==="Lost"?"":"display:none")+'"><label>Lost reason</label><select name="lostReason">'+lostOpts+'</select></div></div>'+
+        '<div class="field row2"><div class="field"><label>Quote amount (USD)</label><input type="number" name="quote" value="'+(l.quote||0)+'" step="any"></div>'+
+          '<div class="field"><label>Deposit paid (USD)</label><input type="number" name="deposit" value="'+(l.deposit||0)+'" step="any"></div></div>'+
+        '<div class="field"><label>Awarded amount (USD)</label><input type="number" name="awarded" value="'+(l.awarded||0)+'" step="any"></div>'+
+        '<div class="field row2"><div class="field"><label>Inquiry date</label><input type="date" name="dInquiry" value="'+l.dInquiry+'"></div>'+
+          '<div class="field"><label>Quote issued date</label><input type="date" name="dQuote" value="'+l.dQuote+'"></div></div>'+
+        '<div class="field row2"><div class="field"><label>Deposit date</label><input type="date" name="dDeposit" value="'+l.dDeposit+'"></div>'+
+          '<div class="field"><label>Awarded date</label><input type="date" name="dAwarded" value="'+l.dAwarded+'"></div></div>'+
+        '<div class="field"><label>Notes</label><textarea name="notes">'+esc(l.notes)+'</textarea></div>'+
+        '<div class="actions">'+
+          (isNew?'<span></span>':'<button type="button" class="btn ghost" onclick="delLead(\''+l.id+'\')">Delete</button>')+
+          '<span><button type="button" class="btn ghost" onclick="closeForm()">Cancel</button> '+
+          '<button type="submit" class="btn primary">'+(isNew?"Create":"Save")+'</button></span>'+
+        '</div>'+
+      '</form></div></div>';
+    $("#modalRoot").innerHTML=html;
+    $("#mb").addEventListener("mousedown",function(e){if(e.target.id==="mb")closeForm();});
+    document.addEventListener("keydown",escClose);
+    var form=$("#lf");
+    $("#stageSel").addEventListener("change",function(){
+      $("#lostWrap").style.display = this.value==="Lost" ? "" : "none";
+    });
+    form.addEventListener("submit",function(e){
+      e.preventDefault();
+      var fd=form.elements;
+      var rec=Object.assign({},byId(id)||{},{
+        id:l.id, name:fd.name.value.trim(), contact:fd.contact.value.trim(), location:fd.location.value.trim(),
+        source:fd.source.value, buyer:fd.buyer.value, stage:fd.stage.value,
+        lostReason:fd.stage.value==="Lost"?fd.lostReason.value:"",
+        quote:Number(fd.quote.value||0), deposit:Number(fd.deposit.value||0), awarded:Number(fd.awarded.value||0),
+        notes:fd.notes.value.trim(),
+        dInquiry:fd.dInquiry.value, dQuote:fd.dQuote.value, dDeposit:fd.dDeposit.value, dAwarded:fd.dAwarded.value,
+        plines:$$('input[name="pl"]:checked',form).map(function(x){return x.value;})
+      });
+      // keep any dates not in the form
+      ["dVisitSet","dVisitDone"].forEach(function(k){ if(!(k in rec)) rec[k]=(byId(id)||{})[k]||""; });
+      var arr=leads(), i=-1;
+      for(var k=0;k<arr.length;k++){if(arr[k].id===rec.id){i=k;break;}}
+      if(i>=0)arr[i]=rec; else arr.push(rec);
+      save(); closeForm(); render();
+      toast(isNew?"Lead created":"Lead saved");
+    });
+  }
+  function escClose(e){if(e.key==="Escape")closeForm();}
+  window.closeForm=function(){$("#modalRoot").innerHTML="";document.removeEventListener("keydown",escClose);};
+  window.delLead=function(id){
+    if(!confirm("Delete this lead?"))return;
+    state.leads=leads().filter(function(l){return l.id!==id;});
+    save();closeForm();render();toast("Deleted");
+  };
+
+  /* ---------- data menu ---------- */
+  $("#dataBtn").addEventListener("click",function(){
+    var json=JSON.stringify(state,null,2);
+    var html='<div class="modal-back" id="mb"><div class="modal" role="dialog" aria-modal="true" aria-label="Data and backup">'+
+      '<header><h3>Data &amp; backup</h3><button type="button" onclick="closeForm()" aria-label="Close">×</button></header>'+
+      '<form id="lf" onsubmit="return false">'+
+      '<p class="muted" style="margin:0;font-size:var(--s-1)">Everything is stored in this browser only. Copy the JSON for a backup, or export the leads as CSV.</p>'+
+      '<div class="field"><label>Workspace JSON</label><textarea readonly style="min-height:150px;font-family:var(--font-mono);font-size:.75rem">'+esc(json)+'</textarea></div>'+
+      '<div class="actions"><button type="button" class="btn ghost" onclick="resetData()">Reset to sample data</button>'+
+      '<span><button type="button" class="btn ghost" onclick="copyJSON()">Copy JSON</button> '+
+      '<button type="button" class="btn primary" onclick="exportCSV()">Export CSV</button></span></div>'+
+      '</form></div></div>';
+    $("#modalRoot").innerHTML=html;
+    $("#mb").addEventListener("mousedown",function(e){if(e.target.id==="mb")closeForm();});
+    document.addEventListener("keydown",escClose);
+  });
+  window.copyJSON=function(){
+    var t=JSON.stringify(state,null,2);
+    if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){toast("JSON copied");},function(){toast("Copy blocked — select manually");});
+  };
+  window.exportCSV=function(){
+    var cols=["name","contact","location","source","buyer","stage","plines","quote","deposit","awarded","lostReason","dInquiry","dQuote","dDeposit","dAwarded","notes"];
+    var rows=[cols.join(",")].concat(leads().map(function(l){
+      return cols.map(function(c){
+        var v = c==="plines" ? l.plines.join(" | ") : l[c];
+        v=String(v==null?"":v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+      }).join(",");
+    }));
+    var txt=rows.join("\n");
+    try{
+      var blob=new Blob([txt],{type:"text/csv"});
+      var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="leads-"+todayISO()+".csv";
+      document.body.appendChild(a);a.click();a.remove();toast("CSV downloaded");
+    }catch(e){
+      if(navigator.clipboard)navigator.clipboard.writeText(txt).then(function(){toast("Download blocked — CSV copied instead");});
+    }
+  };
+  window.resetData=function(){
+    if(!confirm("Replace everything with the original sample data?"))return;
+    state=seed();persist(state);closeForm();render();toast("Sample data restored");
+  };
+
+  /* ---------- theme ---------- */
+  try{var st=localStorage.getItem("funnel.theme");if(st)document.documentElement.setAttribute("data-theme",st);}catch(e){}
+  $("#themeToggle").addEventListener("click",function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next=dark?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    try{localStorage.setItem("funnel.theme",next);}catch(e){}
+  });
+
+  persist(state);
+  render();
+})();
+</script>
+</body>
+</html>
