@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jason Bernados — Automation &amp; SaaS Builder</title>
-<meta name="description" content="Jason Bernados builds automation and SaaS: Athlos, a live sports platform run by scheduled jobs and monitoring, plus operations, estimating, lead and content tools for construction. Working software you can click, not slides. Civil engineer, remote." />
+<title>Jason Bernados — Websites, Apps &amp; Automation</title>
+<meta name="description" content="Jason Bernados builds websites, web and mobile apps, and automation. Live work: Athlos (playathlos.com), a sports platform built and run solo, and ritehomemodular.com. Remote." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F3F4F1'/%3E%3Crect x='4.5' y='4.5' width='23' height='23' fill='none' stroke='%231B1E1B' stroke-width='1.4'/%3E%3Cpath d='M4 12V4h8M28 20v8h-8' fill='none' stroke='%23C43D2B' stroke-width='2.6'/%3E%3C/svg%3E" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bernadosjason-dev.github.io/portfolio/" />
-<meta property="og:title" content="Jason Bernados — Automation &amp; SaaS Builder" />
-<meta property="og:description" content="Automation and SaaS that runs the business while nobody is watching: a live sports platform, plus estimating, pipeline, project and content tools. Remote." />
+<meta property="og:title" content="Jason Bernados — Websites, Apps &amp; Automation" />
+<meta property="og:description" content="Websites, apps and automation, built and shipped by one developer. Live work you can open: playathlos.com and ritehomemodular.com. Remote." />
 <meta property="og:image" content="https://bernadosjason-dev.github.io/portfolio/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Jason Bernados — Automation &amp; SaaS Builder" />
-<meta name="twitter:description" content="Automation and SaaS that runs the business while nobody is watching — a live sports platform plus tools for construction." />
+<meta name="twitter:title" content="Jason Bernados — Websites, Apps &amp; Automation" />
+<meta name="twitter:description" content="Websites, apps and automation, built and shipped by one developer. Live work: playathlos.com, ritehomemodular.com." />
 <meta name="twitter:image" content="https://bernadosjason-dev.github.io/portfolio/og.png" />
 <!-- Analytics: cookieless, no personal data. Create a free property at dash.cloudflare.com > Web Analytics, then uncomment and paste your token. -->
 <!-- <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"YOUR_TOKEN_HERE"}'></script> -->
@@ -556,15 +556,79 @@
     }
     .hero .eyebrow, .hero h1, .hero .role, .hero .scope, .hero .meta, .hero .cta-row { opacity: 1; }
   }
+
+  /* ============================================================
+     SERVICES
+     ============================================================ */
+  .services {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  @media (min-width: 900px) { .services { grid-template-columns: repeat(3, 1fr); } }
+  .svc {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .svc .no { font-family: var(--font-mono); font-size: var(--step--1); color: var(--redline); letter-spacing: 0.08em; }
+  .svc h3 {
+    margin: 0.5rem 0 0.7rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--step-2);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .svc > p { margin: 0 0 1rem; color: var(--ink-2); }
+  .svc ul { margin: 0 0 1.4rem; padding: 0; list-style: none; font-size: 0.95rem; color: var(--ink-2); }
+  .svc li { display: grid; grid-template-columns: 1rem 1fr; gap: 0.5rem; padding: 0.3rem 0; border-bottom: 1px dashed var(--line); }
+  .svc li::before { content: "+"; font-family: var(--font-mono); color: var(--redline); }
+  .svc .proof { margin: auto 0 0; font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-3); }
+  .svc .proof a { color: var(--ink); border-bottom: 1px solid var(--redline); }
+  .svc .proof a:hover { color: var(--redline); }
+
+  .group-label {
+    margin: clamp(2rem, 5vw, 3rem) 0 0;
+    padding-bottom: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  #work .s-head + .group-label { margin-top: 0; }
+
+  .stack { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+  .stack span {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-2);
+  }
+
+  .steps { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line); counter-reset: st; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .step { padding: 1.3rem 1.2rem 1.4rem 0; border-bottom: 1px solid var(--line); }
+  @media (min-width: 760px) { .step + .step { padding-left: 1.2rem; border-left: 1px solid var(--line); } }
+  .step h3 { margin: 0 0 0.4rem; font-family: var(--font-mono); font-size: var(--step--1); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--redline); }
+  .step h3::before { counter-increment: st; content: counter(st, decimal-leading-zero) "  "; color: var(--ink-3); }
+  .step p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
 </style>
 </head>
 <body>
-<a class="skip" href="#work">Skip to work</a>
+<a class="skip" href="#services">Skip to services</a>
 <div class="sheet-frame" aria-hidden="true"></div>
 
 <div class="titleblock" aria-hidden="true">
   <div><span class="k">NAME</span><span class="v">Jason Bernados</span></div>
-  <div><span class="k">DISC.</span><span class="v">Automation / SaaS</span></div>
+  <div><span class="k">DISC.</span><span class="v">Web &middot; Apps &middot; Automation</span></div>
   <div><span class="k">LOC.</span><span class="v">Remote &middot; UTC+8</span></div>
   <div><span class="k">REV.</span><span class="v">2026.10</span></div>
   <div><span class="k">SHEET</span><span class="v">01 / 01</span></div>
@@ -576,42 +640,70 @@
   <header class="hero" id="top">
     <p class="eyebrow">Portfolio &nbsp;/&nbsp; 2026</p>
     <h1>Jason Bernados</h1>
-    <p class="role">Automation &amp; SaaS Builder</p>
-    <p class="scope">I build software that runs the work for you: scheduled jobs, payment flows, notifications and monitoring that keep going when nobody is watching. I designed, built and run Athlos, a live sports platform, solo, and I build tools for the construction industry I trained in.</p>
+    <p class="role">Website Development &middot; App Development &middot; Automation</p>
+    <p class="scope">I design, build and ship websites and apps, and automate the work around them, end to end and on my own. Two of them are live right now: a sports platform with 99 releases behind it, and a company website. Open them, click around, then decide.</p>
     <div class="meta">
       <span>Remote &mdash; working with US clients</span>
-      <span>Open to automation roles &amp; projects</span>
+      <span>Open to projects &amp; full-time roles</span>
       <span>Live: playathlos.com &middot; ritehomemodular.com</span>
     </div>
     <div class="cta-row">
-      <a class="btn primary" href="mailto:bernados.jason@gmail.com">Get in touch <span class="arrow" aria-hidden="true">&rarr;</span></a>
-      <a class="btn ghost" href="#work">See selected work</a>
+      <a class="btn primary" href="mailto:bernados.jason@gmail.com?subject=Project%20inquiry">Start a project <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <a class="btn ghost" href="#work">See the work</a>
     </div>
   </header>
 
   <hr class="rule" />
 
-  <!-- PROFILE -->
-  <section id="profile" aria-labelledby="profile-h">
+  <!-- SERVICES -->
+  <section id="services" aria-labelledby="services-h">
     <div class="s-head reveal">
       <span class="idx">A&#8209;01</span>
-      <h2 id="profile-h">Profile</h2>
+      <h2 id="services-h">Services</h2>
     </div>
-    <div class="profile-grid">
-      <div>
-        <p class="lede reveal">I&rsquo;m a civil engineer who builds automation and SaaS.</p>
-        <p class="lede reveal">Two years on jobsites, then I started building the tools the office actually needed. Since then I have shipped Athlos, a live platform for players, clubs, organizers, referees and venues, built and operated solo: 99 releases, 11 scheduled jobs and an hourly automated bug watch. Everything on this page is working software you can open and click right now. Not slides, not mockups.</p>
-        <p class="lede reveal">I build small, ship fast, and speak the trade, so a scoping call doesn&rsquo;t need a translator. If a repetitive, error-prone process is costing your team time every week, that is the kind of thing I make disappear.</p>
+    <div class="services reveal">
+      <div class="svc">
+        <span class="no">S&#8209;01</span>
+        <h3>Website Development</h3>
+        <p>Fast, mobile-first websites that look like the business and bring in enquiries, not templates with your logo swapped in.</p>
+        <ul>
+          <li>Company sites, landing pages and portfolios</li>
+          <li>Built to load fast and read well on a phone</li>
+          <li>Search basics: titles, link previews, page structure</li>
+          <li>Contact and enquiry forms wired to your email</li>
+          <li>You own the code and the domain; no lock-in</li>
+        </ul>
+        <p class="proof">Proof: <a href="https://ritehomemodular.com" target="_blank" rel="noopener">ritehomemodular.com</a> &middot; this site</p>
       </div>
-      <dl class="facts reveal">
-        <div><dt>Working</dt><dd>Remote &middot; US construction clients</dd></div>
-        <div><dt>Based</dt><dd>Cagayan de Oro, Philippines (UTC+8)</dd></div>
-        <div><dt>Background</dt><dd>Civil engineer &middot; two years on jobsites</dd></div>
-        <div><dt>Currently</dt><dd>Ritehome Modular Systems &middot; <a href="https://ritehomemodular.com" target="_blank" rel="noopener" style="text-decoration:underline;text-decoration-color:var(--redline)">ritehomemodular.com</a></dd></div>
-        <div><dt>Shipped</dt><dd>Athlos &middot; live at playathlos.com</dd></div>
-        <div><dt>Builds</dt><dd>Automation, SaaS, estimating, lead &amp; content tools</dd></div>
-        <div><dt>How I work</dt><dd>Small releases &middot; plain language &middot; no lock-in</dd></div>
-      </dl>
+      <div class="svc">
+        <span class="no">S&#8209;02</span>
+        <h3>App Development</h3>
+        <p>Web apps that work on any phone and install like an app: accounts, payments, bookings, chat, dashboards and admin panels.</p>
+        <ul>
+          <li>Sign-in, roles and permissions enforced in the database</li>
+          <li>Bookings, payments by GCash with receipt review</li>
+          <li>Realtime chat and push notifications to phones</li>
+          <li>Admin and owner portals, reports and exports</li>
+          <li>Tested before every release, monitored after</li>
+        </ul>
+        <p class="proof">Proof: <a href="athlos.html">Athlos case study</a> &middot; <a href="https://playathlos.com" target="_blank" rel="noopener">playathlos.com</a></p>
+      </div>
+      <div class="svc">
+        <span class="no">S&#8209;03</span>
+        <h3>Automation</h3>
+        <p>The repetitive work between your tools, done by software on a schedule: reminders, follow-ups, lead lists, reports and content.</p>
+        <ul>
+          <li>Scheduled jobs, webhooks and alerts</li>
+          <li>Lead sourcing and contact extraction</li>
+          <li>Content and video produced from templates</li>
+          <li>n8n and Make workflows, API integrations</li>
+          <li>Monitoring that flags failures before customers do</li>
+        </ul>
+        <p class="proof">Proof: <a href="pipeline.html">lead pipeline</a> &middot; <a href="content.html">content engine</a> &middot; <a href="athlos.html#automated">Athlos jobs</a></p>
+      </div>
+    </div>
+    <div class="stack reveal" aria-label="Tools I use">
+      <span>Next.js</span><span>React</span><span>TypeScript</span><span>Tailwind CSS</span><span>Supabase</span><span>PostgreSQL</span><span>Vercel</span><span>Web Push</span><span>n8n</span><span>Make</span><span>Python</span><span>Playwright</span><span>HTML / CSS / JS</span>
     </div>
   </section>
 
@@ -621,6 +713,7 @@
       <span class="idx">A&#8209;02</span>
       <h2 id="work-h">Selected Work</h2>
     </div>
+    <p class="group-label reveal">Apps</p>
     <article class="project reveal">
       <span class="pidx">P&#8209;01</span>
       <div>
@@ -636,6 +729,7 @@
       </dl>
     </article>
 
+    <p class="group-label reveal">Websites</p>
     <article class="project reveal">
       <span class="pidx">P&#8209;02</span>
       <div>
@@ -649,6 +743,7 @@
       </dl>
     </article>
 
+    <p class="group-label reveal">Automation &amp; business tools</p>
     <article class="project reveal">
       <span class="pidx">P&#8209;03</span>
       <div>
@@ -662,7 +757,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;04</span>
       <div>
@@ -676,7 +770,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;05</span>
       <div>
@@ -690,7 +783,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;06</span>
       <div>
@@ -704,7 +796,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;07</span>
       <div>
@@ -718,7 +809,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;08</span>
       <div>
@@ -732,7 +822,6 @@
         <div><dt>Year</dt><dd>2026</dd></div>
       </dl>
     </article>
-
     <article class="project reveal">
       <span class="pidx">P&#8209;09</span>
       <div>
@@ -748,44 +837,47 @@
     </article>
   </section>
 
-  <!-- CAPABILITIES -->
-  <section id="capabilities" aria-labelledby="cap-h">
+  <!-- PROCESS -->
+  <section id="process" aria-labelledby="process-h">
     <div class="s-head reveal">
       <span class="idx">A&#8209;03</span>
-      <h2 id="cap-h">Capabilities</h2>
+      <h2 id="process-h">How a project runs</h2>
     </div>
-    <div class="caps">
-      <div class="cap reveal">
-        <h3>Estimation &amp; Takeoff</h3>
-        <p>Quantity takeoff, cost books, markup and contingency modeling, cut-list optimization.</p>
+    <div class="steps reveal">
+      <div class="step"><h3>Scope</h3><p>One call. You describe the job; I come back with what gets built, the timeline and a fixed price.</p></div>
+      <div class="step"><h3>Build</h3><p>You see a working version early, on a real link, and changes every few days rather than one reveal at the end.</p></div>
+      <div class="step"><h3>Launch</h3><p>Tested on phones and desktop, connected to your domain, with the basics for search and link previews in place.</p></div>
+      <div class="step"><h3>Run</h3><p>Monitoring, fixes and small releases after launch, or a clean handover of the code and accounts. Your choice.</p></div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profile" aria-labelledby="profile-h">
+    <div class="s-head reveal">
+      <span class="idx">A&#8209;04</span>
+      <h2 id="profile-h">Profile</h2>
+    </div>
+    <div class="profile-grid">
+      <div>
+        <p class="lede reveal">I&rsquo;m a civil engineer who builds websites, apps and automation.</p>
+        <p class="lede reveal">Two years on jobsites, then I started building the tools the office actually needed. Since then I have shipped Athlos, a live platform for players, clubs, organizers, referees and venues, designed, built and operated solo: 99 releases, 11 scheduled jobs and an hourly automated bug watch. Everything on this page is working software you can open and click right now. Not slides, not mockups.</p>
+        <p class="lede reveal">I build small, ship fast and write in plain language, so you always know what you are getting and when.</p>
       </div>
-      <div class="cap reveal">
-        <h3>Workflow Automation</h3>
-        <p>n8n and Make, API integration, web scraping, database cron jobs, webhooks and push notifications &mdash; scheduled, unattended pipelines with monitoring.</p>
-      </div>
-      <div class="cap reveal">
-        <h3>AI Integration</h3>
-        <p>LLM-driven extraction, retrieval and memory systems, prompt design, content pipelines.</p>
-      </div>
-      <div class="cap reveal">
-        <h3>Product Design</h3>
-        <p>Turning a messy operational process into software someone will actually use daily.</p>
-      </div>
-      <div class="cap reveal">
-        <h3>Tooling</h3>
-        <p>Full-stack web apps (Next.js, Postgres, row-level security), self-contained tools, SVG interfaces, video rendered from code.</p>
-      </div>
-      <div class="cap reveal">
-        <h3>Domain Fluency</h3>
-        <p>Construction and manufacturing &mdash; I speak the trade, so requirements don&rsquo;t need translating.</p>
-      </div>
+      <dl class="facts reveal">
+        <div><dt>Currently</dt><dd>Ritehome Modular Systems &middot; <a href="https://ritehomemodular.com" target="_blank" rel="noopener" style="text-decoration:underline;text-decoration-color:var(--redline)">ritehomemodular.com</a></dd></div>
+        <div><dt>Shipped</dt><dd>Athlos &middot; live at playathlos.com</dd></div>
+        <div><dt>Services</dt><dd>Websites &middot; web &amp; mobile apps &middot; automation</dd></div>
+        <div><dt>Working</dt><dd>Remote &middot; US clients</dd></div>
+        <div><dt>Based</dt><dd>Cagayan de Oro, Philippines (UTC+8)</dd></div>
+        <div><dt>Background</dt><dd>Civil engineer &middot; two years on jobsites</dd></div>
+      </dl>
     </div>
   </section>
 
   <!-- WHERE AI EARNS ITS PLACE -->
   <section id="ai" aria-labelledby="ai-h">
     <div class="s-head reveal">
-      <span class="idx">A&#8209;04</span>
+      <span class="idx">A&#8209;05</span>
       <h2 id="ai-h">Where AI earns its place</h2>
     </div>
     <p class="lede reveal">In an operations business the tools are rarely the expense. The expense is the manual work <em>between</em> them &mdash; a quantity re-typed from the estimate into the schedule, a decision re-explained because nobody wrote it down, the same post rewritten for the fourth time this month. That work is slow, it is where errors get in, and you cannot fix it by hiring &mdash; a second person doing it twice as fast still does it wrong sometimes.</p>
@@ -814,10 +906,10 @@
   <!-- CONTACT -->
   <section id="contact" class="contact" aria-labelledby="contact-h">
     <div class="s-head reveal">
-      <span class="idx">A&#8209;05</span>
+      <span class="idx">A&#8209;06</span>
       <h2 id="contact-h">Contact</h2>
     </div>
-    <p class="lede reveal">Open to automation roles and SaaS or automation projects, remote. Best fit is a business with repetitive, error-prone work between its tools &mdash; especially where construction domain knowledge is the hard part, and where AI does real work rather than decoration. The fastest way to reach me is email.</p>
+    <p class="lede reveal">Open to website, app and automation projects, and to full-time roles, remote. Tell me what the site or app has to do and who uses it; I&rsquo;ll reply with a scope, a timeline and a price. The fastest way to reach me is email.</p>
     <div class="contact-lines reveal">
       <a href="mailto:bernados.jason@gmail.com"><span class="k">Email</span><span class="v">bernados.jason@gmail.com</span></a>
       <span><span class="k">Working</span><span class="v">Remote &mdash; US clients</span></span>
