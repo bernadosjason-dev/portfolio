@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Athlos</title>
-<meta name="description" content="Athlos: one app for pickleball in Cagayan de Oro — ratings, open play, court booking, tournaments that schedule themselves, and a portal for venues. Designed and built solo." />
-<meta property="og:title" content="Athlos — pickleball for a whole city, in one app" />
+<meta name="description" content="Athlos: one app for pickleball in the Philippines — ratings, open play, court booking, tournaments that schedule themselves, and a portal for venues. Live at playathlos.com. Designed, built and run solo." />
+<meta property="og:title" content="Athlos — pickleball in the Philippines, in one app" />
 <meta property="og:image" content="athlos-poster.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -86,6 +86,15 @@
   .rules li::before{counter-increment:r;content:counter(r,decimal-leading-zero);font-family:var(--font-mono);font-size:var(--s-1);color:var(--redline)}
   .rules b{color:var(--ink);font-weight:600}
 
+  .live-link{display:inline-flex;align-items:center;gap:0.6rem;margin-top:1.6rem;padding:0.8rem 1.3rem;font-family:var(--font-mono);font-size:var(--s-1);letter-spacing:0.04em;background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
+  .live-link:hover{background:var(--redline);border-color:var(--redline)}
+  .live-link i{width:7px;height:7px;border-radius:50%;background:#45d483}
+  .reels{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1.75rem}
+  @media (min-width:640px){.reels{grid-template-columns:repeat(3,1fr)}}
+  .reel{margin:0;border:1px solid var(--line);background:var(--card);padding:0.5rem}
+  .reel video{display:block;width:100%;height:auto;aspect-ratio:9/16;background:#0b1220}
+  .reel figcaption{padding:0.6rem 0.2rem 0.2rem;font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3)}
+  .reel figcaption b{display:block;color:var(--ink);font-weight:500}
   footer.foot{padding:2rem 0 3rem;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:var(--s-1);color:var(--ink-3);display:flex;gap:0.6rem 1.5rem;flex-wrap:wrap;justify-content:space-between}
 </style>
 </head>
@@ -97,8 +106,9 @@
 
   <header class="hero">
     <p class="eyebrow">Product · founder build</p>
-    <h1>Athlos: pickleball for a whole city, in one app.</h1>
-    <p class="thesis">Players in Cagayan de Oro were finding games in group chats, booking courts by text and paying by screenshot, and tracking tournaments on paper. Athlos puts all of it in one place &mdash; ratings, open play, court booking, tournaments and a portal for the venues &mdash; and automates the admin that used to eat an organizer&rsquo;s day.</p>
+    <h1>Athlos: pickleball in the Philippines, in one app.</h1>
+    <p class="thesis">Players were finding games through &ldquo;+1&rdquo; lists in group chats, booking courts by text, paying by screenshot and tracking tournaments on paper. Athlos puts all of it in one place &mdash; ratings, open play, court booking, tournaments, chat and a portal for the venues &mdash; and automates the admin that used to eat an organizer&rsquo;s day.</p>
+    <a class="live-link" href="https://playathlos.com" target="_blank" rel="noopener"><i aria-hidden="true"></i> Live at playathlos.com &rarr;</a>
   </header>
 
   <section style="padding-top:0">
@@ -116,8 +126,12 @@
   <section>
     <div class="s-head"><span class="idx">01</span><h2>At a glance</h2></div>
     <div class="facts">
+      <div class="fact"><b>99</b><span>versioned releases since the first commit on Sep 21, 2026</span></div>
+      <div class="fact"><b>113</b><span>database migrations: 86 tables, 619 functions, 108 security policies</span></div>
+      <div class="fact"><b>11</b><span>scheduled jobs that run the platform with nobody at the desk</span></div>
+      <div class="fact"><b>388</b><span>automated tests: 350 unit tests + 38 database scenario scripts</span></div>
       <div class="fact"><b>5</b><span>sides of one app: players, clubs, organizers, referees, venues</span></div>
-      <div class="fact"><b>80+</b><span>database migrations behind the app</span></div>
+      <div class="fact"><b>59</b><span>venues in the court directory, with maps and directions</span></div>
       <div class="fact"><b>24/7</b><span>automated bug watch, checked every hour</span></div>
       <div class="fact"><b>Oct 11</b><span>closed beta opens, 2026</span></div>
     </div>
@@ -127,11 +141,12 @@
     <div class="s-head"><span class="idx">02</span><h2>What it does</h2></div>
     <div class="mods">
       <div class="mod"><span class="who">Players</span><p>An Athlos Rating from 2.000 to 8.000 for singles, doubles and mixed. Only refereed games move it, so the number means something. Form, clutch games and partner chemistry on top.</p></div>
-      <div class="mod"><span class="who">Open play</span><p>Find a game tonight by day, level and price. Check in, join a fair queue, and get called to your court by push.</p></div>
-      <div class="mod"><span class="who">Courts</span><p>Every venue in the city with directions. Pick a free slot, pay by GCash, the venue confirms. Refunds follow written rules, not arguments.</p></div>
+      <div class="mod"><span class="who">Open play</span><p>Organizers schedule a session in under a minute and share one short link. Players join, pay ahead by GCash with a receipt, and drop to an automatic waitlist when it is full. Every session gets its own group chat. Check in, join a fair queue, and get called to your court by push.</p></div>
+      <div class="mod"><span class="who">Courts</span><p>A court directory with maps and directions. Pick a free slot, the slot is held while you pay by GCash, the venue confirms the receipt. Can&rsquo;t make it? Pass the booking to a friend. Refunds follow written rules, not arguments.</p></div>
       <div class="mod"><span class="who">Tournaments</span><p>Set up in five steps. Groups + knockout, round robin or elimination. The schedule builds itself: every match gets a time, a court and a referee, and the knockout runs as the evening main event.</p></div>
       <div class="mod"><span class="who">Referees</span><p>Certified referees with their own desk and ID. Assigned automatically, rebalanced when a match moves, called to court on their phone.</p></div>
-      <div class="mod"><span class="who">Venues</span><p>A separate portal to approve payments, add walk-ins and run open play. App bookings, walk-ins and open play share one calendar, so nothing double-books.</p></div>
+      <div class="mod"><span class="who">Venues</span><p>A separate portal to approve payments, add walk-ins and run open play, plus the venue&rsquo;s own booking page with no Athlos branding and a short link for its Facebook Page. App bookings, walk-ins and open play share one calendar, so nothing double-books.</p></div>
+      <div class="mod"><span class="who">Messaging</span><p>Direct messages, club and venue chats and open play group chats, with emoji reactions, unsend, archive and delete, and push notifications.</p></div>
     </div>
   </section>
 
@@ -140,19 +155,32 @@
     <ul class="rules">
       <li><span><b>Scheduling.</b> Draw the bracket and every match is timed, placed on a court and given a referee. Move a match and the referee load rebalances.</span></li>
       <li><span><b>Reminders and call-to-court.</b> Scheduled jobs remind players before their match and buzz their phone when their court is ready.</span></li>
-      <li><span><b>Booking holds and refunds.</b> Unpaid holds expire on their own; refunds are due by rule when a venue declines or cancels.</span></li>
+      <li><span><b>Booking holds and refunds.</b> Unpaid holds expire on their own; when a venue declines or cancels, the player chooses a refund or a free rebook and the deadline is tracked.</span></li>
+      <li><span><b>Show-up record.</b> No-shows and late cancels are recorded from check-ins, so organizers can see who reliably turns up.</span></li>
+      <li><span><b>Fees by date.</b> The booking fee switches from the pilot rate to the launch rate on a set date, with no code change; every booking keeps the fee it was made with.</span></li>
+      <li><span><b>Policy updates.</b> Publishing a new Terms or Privacy version notifies every player and asks them to accept it on their next visit.</span></li>
       <li><span><b>Ratings.</b> Verified results update ratings and leaderboards with no one entering numbers by hand.</span></li>
       <li><span><b>Monitoring.</b> An agent checks errors, failed jobs and support messages every hour, and drafts a fix branch when it finds a real bug.</span></li>
     </ul>
   </section>
 
   <section>
-    <div class="s-head"><span class="idx">04</span><h2>How it&rsquo;s built</h2></div>
-    <p class="lede">Next.js on Vercel, Supabase for Postgres, auth, storage and scheduled jobs. Business rules live in the database behind row-level security, so the phone app, the venue desk and the organizer console all enforce the same rules. Web push for alerts. Designed, built and run solo.</p>
+    <div class="s-head"><span class="idx">04</span><h2>Launch content, rendered from code</h2></div>
+    <p class="lede">The launch-week reels are not edited by hand. Each one is a web page animated frame by frame, captured in a headless browser and encoded to video. The sound effects and music are synthesized in Python, so there is nothing to license. Changing a price or a caption is one edit and a re-render, which is how the venue reel was updated the same evening the booking fee changed.</p>
+    <div class="reels">
+      <figure class="reel"><video controls playsinline preload="none" poster="athlos-reel-1-plus-one.jpg"><source src="athlos-reel-1-plus-one.mp4" type="video/mp4" /></video><figcaption><b>&ldquo;The +1 list&rdquo;</b>Players · 30 s</figcaption></figure>
+      <figure class="reel"><video controls playsinline preload="none" poster="athlos-reel-2-venues.jpg"><source src="athlos-reel-2-venues.mp4" type="video/mp4" /></video><figcaption><b>&ldquo;May slot pa?&rdquo;</b>Venues · 31 s</figcaption></figure>
+      <figure class="reel"><video controls playsinline preload="none" poster="athlos-reel-3-organizers.jpg"><source src="athlos-reel-3-organizers.mp4" type="video/mp4" /></video><figcaption><b>&ldquo;Open play in 60 seconds&rdquo;</b>Organizers · 35 s</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="s-head"><span class="idx">05</span><h2>How it&rsquo;s built</h2></div>
+    <p class="lede">Next.js on Vercel, Supabase for Postgres, auth, storage, realtime and scheduled jobs. Business rules live in the database behind row-level security, so the phone app, the venue desk and the organizer console all enforce the same rules, and every rule change ships with a scenario test that runs against a real Postgres. Web push for alerts. Designed, built and run solo.</p>
   </section>
 
   <footer class="foot">
-    <span>Athlos · Cagayan de Oro</span>
+    <span>Athlos · Philippines · playathlos.com</span>
     <span>2026</span>
   </footer>
 
