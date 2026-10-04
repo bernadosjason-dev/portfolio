@@ -557,6 +557,24 @@
     .hero .eyebrow, .hero h1, .hero .role, .hero .scope, .hero .meta, .hero .cta-row { opacity: 1; }
   }
 
+
+  /* hero photo */
+  .hero-grid { display: grid; grid-template-columns: 1fr; gap: 1.75rem; }
+  .hero-photo { margin: 0; width: clamp(120px, 34vw, 150px); order: -1; opacity: 0; animation: rise 0.6s ease-out 0.1s forwards; }
+  .hero-photo .frame { position: relative; padding: 6px; border: 1px solid var(--sheet-edge); background: var(--paper); }
+  .hero-photo .frame::before, .hero-photo .frame::after {
+    content: ""; position: absolute; width: 14px; height: 14px; border-color: var(--redline); border-style: solid;
+  }
+  .hero-photo .frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .hero-photo .frame::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .hero-photo img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; filter: saturate(0.92); }
+  .hero-photo figcaption { white-space: nowrap; margin-top: 0.55rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+  @media (min-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr 260px; gap: 3.5rem; align-items: start; }
+    .hero-photo { width: 100%; order: 0; margin-top: 2.6rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero-photo { opacity: 1; } }
+
   /* ============================================================
      SERVICES
      ============================================================ */
@@ -638,6 +656,8 @@
 
   <!-- HERO -->
   <header class="hero" id="top">
+    <div class="hero-grid">
+    <div class="hero-text">
     <p class="eyebrow">Portfolio &nbsp;/&nbsp; 2026</p>
     <h1>Jason Bernados</h1>
     <p class="role">Website Development &middot; App Development &middot; Automation</p>
@@ -650,6 +670,12 @@
     <div class="cta-row">
       <a class="btn primary" href="mailto:bernados.jason@gmail.com?subject=Project%20inquiry">Start a project <span class="arrow" aria-hidden="true">&rarr;</span></a>
       <a class="btn ghost" href="#work">See the work</a>
+    </div>
+    </div>
+    <figure class="hero-photo">
+      <div class="frame"><img src="jason.jpg" width="480" height="480" alt="Jason Bernados" /></div>
+      <figcaption>Fig. 01 &mdash; J. Bernados</figcaption>
+    </figure>
     </div>
   </header>
 
