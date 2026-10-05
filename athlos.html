@@ -82,6 +82,7 @@
   .mod p{margin:0;color:var(--ink-2);max-width:var(--measure)}
 
   .rules{display:grid;gap:0.9rem;counter-reset:r;padding:0;margin:0}
+  .lede + .rules{margin-top:1.5rem}
   .rules li{list-style:none;display:grid;grid-template-columns:2rem 1fr;gap:1rem;color:var(--ink-2)}
   .rules li::before{counter-increment:r;content:counter(r,decimal-leading-zero);font-family:var(--font-mono);font-size:var(--s-1);color:var(--redline)}
   .rules b{color:var(--ink);font-weight:600}
@@ -127,9 +128,9 @@
     <div class="s-head"><span class="idx">01</span><h2>At a glance</h2></div>
     <div class="facts">
       <div class="fact"><b>99</b><span>versioned releases since the first commit on Sep 21, 2026</span></div>
-      <div class="fact"><b>113</b><span>database migrations: 86 tables, 619 functions, 108 security policies</span></div>
+      <div class="fact"><b>115</b><span>database migrations: 86 tables, 433 functions, 108 security policies</span></div>
       <div class="fact"><b>11</b><span>scheduled jobs that run the platform with nobody at the desk</span></div>
-      <div class="fact"><b>388</b><span>automated tests: 350 unit tests + 38 database scenario scripts</span></div>
+      <div class="fact"><b>399</b><span>automated tests: 359 unit tests + 40 database scenario scripts</span></div>
       <div class="fact"><b>5</b><span>sides of one app: players, clubs, organizers, referees, venues</span></div>
       <div class="fact"><b>59</b><span>venues in the court directory, with maps and directions</span></div>
       <div class="fact"><b>24/7</b><span>automated bug watch, checked every hour</span></div>
@@ -174,8 +175,21 @@
     </div>
   </section>
 
+  <section id="security">
+    <div class="s-head"><span class="idx">05</span><h2>Security review</h2></div>
+    <p class="lede">On Oct 5, 2026, a week before the beta, I audited the live app against the ten common API security mistakes: hidden buttons, broken access control, other users&rsquo; data, business-logic abuse, trusting third parties, SSRF, data exposure, input validation, rate limiting, and inventory and configuration. I checked every route and every database function that changes data, plus the live grants and security policies. No exploitable hole turned up. The weak spots were fixed the same day in release 1.63.0, and the rest went into a backlog with deadlines.</p>
+    <ul class="rules">
+      <li><span><b>Access control is in the database, not the screen.</b> Every function that changes data checks who is calling: owner, club staff, venue staff, organizer or admin. Hiding a button is never the only gate.</span></li>
+      <li><span><b>Closed a door that was only locked inside.</b> 19 early functions could still be called by signed-out visitors because of a Postgres default. Each refused them inside, but they are now refused before the function runs, with a scenario test proving it.</span></li>
+      <li><span><b>Payments trust nothing they are sent.</b> The payment webhook checks the signature in constant time, asks PayMongo for the real payment, checks the amount and is safe to receive twice. GCash receipts always wait for a person.</span></li>
+      <li><span><b>Private data stays private.</b> Phone numbers, ID details and support messages are visible only to their owner or an admin. A venue sees a booker&rsquo;s phone only for 7 days after play.</span></li>
+      <li><span><b>Smaller fixes.</b> Internal secrets are compared in constant time, and push notification links can only open pages inside the app.</span></li>
+      <li><span><b>Written backlog.</b> Per-IP rate limits before the public launch, a build check that fails if a new function forgets its permission check, and rules for future rewards and SMS codes. Each has a trigger and a date.</span></li>
+    </ul>
+  </section>
+
   <section>
-    <div class="s-head"><span class="idx">05</span><h2>How it&rsquo;s built</h2></div>
+    <div class="s-head"><span class="idx">06</span><h2>How it&rsquo;s built</h2></div>
     <p class="lede">Next.js on Vercel, Supabase for Postgres, auth, storage, realtime and scheduled jobs. Business rules live in the database behind row-level security, so the phone app, the venue desk and the organizer console all enforce the same rules, and every rule change ships with a scenario test that runs against a real Postgres. Web push for alerts. Designed, built and run solo.</p>
   </section>
 
